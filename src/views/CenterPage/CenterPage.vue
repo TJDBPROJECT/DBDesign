@@ -42,6 +42,8 @@
 <script>
 import Header from '/src/components/header.vue';
 import BaiduMap from '/src/components/BaiduMap.vue';
+import { getData } from '@/api/centerpicture.js'; // 导入API请求函数
+
 
 export default {
   computed: {
@@ -62,13 +64,23 @@ export default {
   },
   data() {
     return {
-      data: [],
+      //data: [],
+      data: [], // 存储Customized style list信息的数组
     };
   },
   mounted() {
-    this.generateData();
+    this.getDataFromServer();
   },
   methods: {
+    getDataFromServer() {
+      getData().then((res) => {
+        this.data = res.data; // 假设返回的数据为一个数组，直接将数据赋值给data
+      }).catch((error) => {
+        console.error('获取数据失败:', error);
+      });
+    },
+
+
     CenterPageGoBack() {
       this.$router.push({ name: 'repairpage' });
     },

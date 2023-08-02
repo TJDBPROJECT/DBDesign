@@ -97,7 +97,7 @@
   <script>
   import header from '/src/components/header.vue'
   import { pictureget } from '@/api/detail.js';//获取图片
-  import { getdevicedata } from '@/api/detail.js'; // 导入API请求函数
+  import { getData } from '@/api/detail.js'; // 导入API请求函数
   export default {
     name:'DetailsPage',
     data() {
@@ -140,9 +140,24 @@
         this.activeIndex = this.product.imageList.findIndex(image => image.url === imageUrl);
       },
       fetchDeviceDataFromBackend() {
-      
+      const params = {
+        // Adjust the params object according to your needs
+        cate: this.product.type,
+        name: this.product.name,
+        Description: this.product.description,
+        Price: this.product.price,
+        Img: this.product.currentimageUrl,
+        ImgList: this.product.imageList, // An array of image URLs
+      };
 
-      
+      getdevicedata(params)
+        .then((response) => {
+          this.deviceData = response.data; // Assuming the response.data contains the device data object
+        })
+        .catch((error) => {
+          console.error('Error fetching device data:', error);
+        });
+      },
     },
     watch:{
       activeIndex(newIndex) {
@@ -167,31 +182,11 @@
         }
       }),
 
-      getdevicedata()
-      .then((response) => {
-        // Assuming the response.data contains the device data object
-        const deviceData = response.data;
-
-        // Adjust the params object according to your needs
-        const params = {
-          cate: deviceData.type,
-          name: deviceData.name,
-          Description: deviceData.description,
-          Price: deviceData.price,
-          Img: deviceData.currentimageUrl,
-          ImgList: deviceData.imageList, // An array of image URLs
-        };
-
-    // Now you can use the 'params' object for further processing or manipulation
-    // For example, you can pass it to another function or store it in the component's state
-        console.log('Fetched device data:', params);
-
-    // ... do other things with 'params'
-  })
-  .catch((error) => {
-    console.error('Error fetching device data:', error);
-  });
-      },
+      getData().then((res) => {
+        this.Product = res.Product; // 假设返回的数据为一个数组，直接将数据赋值给data
+        }).catch((error) => {
+        console.error('获取数据失败:', error);
+      });
     }
   };
   </script>

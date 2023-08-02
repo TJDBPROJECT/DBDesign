@@ -67,13 +67,13 @@
             </div>
           </el-form-item>
           <el-form-item label="机身外观">
-            <el-input class="input"  v-model="form.deviceAppearance"></el-input>
+            <el-input class="input"  v-model="form.device_cate"></el-input>
           </el-form-item>
           <el-form-item label="屏幕显示">
-            <el-input  class="input" v-model="form.screenDisplay"></el-input>
+            <el-input  class="input" v-model="form.device_type"></el-input>
           </el-form-item>
           <el-form-item label="屏幕外观">
-            <el-input  class="input" v-model="form.screenAppearance"></el-input>
+            <el-input  class="input" v-model="form.recycle_location"></el-input>
           </el-form-item>
           
     <!-- 其他页面内容 -->
@@ -95,6 +95,8 @@
   import RepairHistory from '@/components/RepairHistory.vue'
   import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
+
+  import { recycle_info } from '@/api/recycle_info.js'
   
   export default {
 
@@ -116,12 +118,11 @@
         productName: '设备名称',
         productModel: '设备型号',
         form: {
-          storageCapacity: '',
-          purchaseChannel: '',
-          deviceAppearance: '',
-          screenDisplay: '',
-          screenAppearance: '',
-          repairHistory: ''
+          device_cate: '类型',
+          device_type: '型号',
+          expectedprice: '价格',
+          recycle_location: '地点',
+          recycle_time: '时间',
         },
       };
     },
@@ -131,27 +132,41 @@
         this.$emit('option-selected', option);
 
       },
-    submitForm() {
-        this.$router.push({ name: 'recycleprice' });
-    },
-    goback() {
-      this.$router.push({ name: 'DetailsPage' });
-    }
-
-    
-
+      submitForm() {
+          this.$router.push({ name: 'recycleprice' });
+          let params = {
+            device_cate: this.form.device_cate,
+            device_type: this.form.device_type,
+            expectedprice: this.form.expectedprice,
+            Recycle_Location: this.form.recycle_location, // Note the capital "R" here, ensure it matches the backend's expected parameter name
+            Recycle_Time: this.form.recycle_time, // Note the capital "R" here, ensure it matches the backend's expected parameter name
+          };
+          recycle_info(params)
+            .then((res) => {
+              // Handle the response if needed
+              console.log(res);
+              // Redirect to the next page after the data has been successfully sent to the backend
+              this.$router.push({ name: 'recycleprice' });
+            })
+            .catch((error) => {
+              // Handle error if needed
+              console.error(error);
+            });
+      },
+      goback() {
+        this.$router.push({ name: 'DetailsPage' });
+      }
     },
     handleOptionSelected(option) {
         console.log('选中的存储容量:', option);
         // 在这里处理选中的存储容量
-      },
+    },
     components: {
-    "seach": header,
-    StorageGroup,
-    RepairHistory,
-    DropdownList,
-  
-    }
+      "seach": header,
+      StorageGroup,
+      RepairHistory,
+      DropdownList,
+    },
   };
   </script>
   

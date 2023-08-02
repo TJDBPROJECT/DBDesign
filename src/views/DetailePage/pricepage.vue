@@ -11,11 +11,7 @@
   </el-steps>
     </el-header>
 
-    <el-steps class="center-steps" :space="300" :active="1" finish-status="success">
-      <el-step title="填写订单信息" />
-      <el-step title="确认预约服务" />
-      <el-step title="支付订单金额" />
-    </el-steps>
+   
 
     <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
@@ -65,7 +61,7 @@ import { ref, computed } from 'vue'
 import { ElTable, ElCountdown } from 'element-plus'
 import logoImage from '@/assets/logo.png'
 import dayjs from 'dayjs'
-
+//import { repairprice_info } from '@/api/repairprice_info';
 
 export default {
   name: 'PricePage',
@@ -74,9 +70,26 @@ export default {
     ElCountdown,
     
   },
+  /*created() {
+  repairprice_info().then((res) => {
+        if (res.data === false) {
+          this.$message.error("获得失败");
+        }
+        else {
+          console.log(res.data)
+          this.$message.success("获得成功");
+          this.repairtime=JSON.parse(res.data.repairtime)
+          this.Username=JSON.parse(res.data.username)
+          this.type_name=JSON.parse(res.data.type_name)
+          this.repairlocation=JSON.parse(res.data.repairlocation)
+          console.log(this.images)
+        }
+      })
+  },*/
   setup() {
     const multipleTableRef = ref(null)
     const multipleSelection = ref([])
+    
     const tableData = [
       {
         imageUrl: logoImage,

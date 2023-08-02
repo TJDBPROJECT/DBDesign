@@ -33,7 +33,7 @@
 
           <div class="carousel-container">
             <el-carousel :interval="5000" arrow="always">
-              <el-carousel-item v-for="item in 4" :key="item">
+              <el-carousel-item v-for="item in 3" :key="item">
                 <h3>{{ item }}</h3>
               </el-carousel-item>
             </el-carousel>
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-
+import { repair_info } from '@/api/repair_info.js'
 export default {
   name: 'RepairPage',
   data() {
@@ -150,6 +150,28 @@ export default {
     },
     submitForm() {
         this.$router.push({ name: 'pricepage' });
+        //请求地址,this和vm指的是全局
+      let params ={
+        username: this.form.name,
+        telephone:this.form.phone,
+        repairlocation:this.form.location,
+        type_name:this.form.deviceName,
+        repairtime:this.form.serviceTime,
+        repairrequirement:this.form.problemDescription,
+      }
+      console.log(params)
+      repair_info(params).then((res) => {
+        console.log(res.data)
+        if (res.data === false) {
+          console.log("登录失败")
+          this.resetForm();
+        }
+        else {
+          console.log("登录成功")
+          this.$router.push('/mainpage')
+        }
+      })
+      
     },
     go_center() {
       this.$router.push({ name: 'CenterPage' });
