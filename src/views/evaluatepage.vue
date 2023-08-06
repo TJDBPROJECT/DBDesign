@@ -1,226 +1,191 @@
-<!-- eslint-disable vue/no-deprecated-slot-attribute -->
+<!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <el-container>
+    <div class="common-layout">
+      <el-container>
         <!--搜索栏部分-->
-        <el-header>
-            <seach />
+        <el-header height="100px">
+          <seach />
         </el-header>
         <el-container>
-            <!--边栏部分-->
-            <el-aside width="200px">
-                <div class="side">
-                    <el-aside>
-                        <el-row class="tac">
-                            <el-col :span="26">
-                                <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen"
-                                    @close="handleClose">
-                                    <el-menu-item index="1">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator one</span>
-                                    </el-menu-item> <el-menu-item index="2">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator two</span>
-                                    </el-menu-item> <el-menu-item index="3">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator three</span>
-                                    </el-menu-item> <el-menu-item index="4">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator four</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="5">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Five</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="6">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Six</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="7">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Seven</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="8">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Eight</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="9">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Nine</span>
-                                    </el-menu-item>
-                                    <el-menu-item index="10">
-                                        <el-icon>
-                                            <setting />
-                                        </el-icon>
-                                        <span>Navigator Ten</span>
-                                    </el-menu-item>
-                                </el-menu>
-                            </el-col>
-                        </el-row>
-                    </el-aside>
-                </div>
-            </el-aside>
-            <el-container>
-                <!--具体部分-->
-                <el-main>
-                    <el-row> <el-col v-for="item in list" :key="item.id" @click="change(item.id)" :span="4" :offset="1">
-                        
-                        
-                            <!-- <el-card :body-style="{ padding: '0px' }" shadow="hover" >
-                                <div @click="goToDetailsPage">
-                                <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                                    class="image" />
-                                <div style="padding: 14px">
-                                    <span>Yummy hamburger</span>
-                                    <div class="bottom">
-                                        <time class="time">{{ currentDate }}</time>
-                                    </div>
-                                </div>
-                            </div>
-                            </el-card> -->
-
-                            <el-card :body-style="{ padding: '0px' }" shadow="hover">
-                                <div @click="goToDetailsPage">
-                                    <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image" />
-                                    <div style="padding: 14px">
-                                    <span>Yummy hamburger</span>
-                                    <div class="bottom">
-                                        <time class="time">{{ currentDate }}</time>
-                                    </div>
-                                    </div>
-                                </div>
-                            </el-card>
-                                                  
-                        </el-col>
-                    </el-row>
-                </el-main>
-                <!--机型部分-->
-
-                <el-footer>
-                    <el-col :span="5" :offset="4">
-                        <el-pagination background layout="prev, pager, next" :total="100" />
-                    </el-col>
-                    <!--
-                    <div class="type" >
-                        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false"
-                            @select="handleSelect">
-                            <el-col :span="4" >
-                                <el-menu-item index="1">笔记本</el-menu-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-menu-item index="2">手机</el-menu-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-menu-item index="3">平板</el-menu-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-menu-item index="4">耳机</el-menu-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-menu-item index="5">手表</el-menu-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-menu-item index="6">智能眼镜</el-menu-item>
-                            </el-col>
-                        </el-menu>
-                    </div>-->
-                </el-footer>
-            </el-container>
+          <!--边栏部分-->
+          <el-aside width="200px">
+            <el-menu default-active="2" class="el-menu-vertical-demo">
+              <el-menu-item index="1" @click="selectBrand('Xiaomi')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>小米</span>
+              </el-menu-item>
+              <el-menu-item index="2" @click="selectBrand('Huawei')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>华为</span>
+              </el-menu-item>
+              <el-menu-item index="3" @click="selectBrand('Lenovo')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>联想</span>
+              </el-menu-item>
+              <el-menu-item index="4" @click="selectBrand('OPPO')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>OPPO</span>
+              </el-menu-item>
+              <el-menu-item index="5" @click="selectBrand('Apple')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>苹果</span>
+              </el-menu-item>
+              <el-menu-item index="6" @click="selectBrand('Sony')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>索尼</span>
+              </el-menu-item>
+              <el-menu-item index="7" @click="selectBrand('Dell')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>戴尔</span>
+              </el-menu-item>
+              <el-menu-item index="8" @click="selectBrand('Nintendo')">
+                <el-icon>
+                  <setting />
+                </el-icon>
+                <span>任天堂</span>
+              </el-menu-item>
+            </el-menu>
+          </el-aside>
+          <!--主体部分-->
+          <!--具体部分-->
+          <el-main>
+            <el-row class="recommend-products">
+              <el-col :span="8" v-for="(product, index) in paginatedProducts" :key="index">
+                <el-col :span="23">
+                  <el-card shadow="hover" @click="goToDetailsPage(product.Type_Name)">
+                    <div class="product-card">
+                      <img :src="product.Structure_Url" alt="product image">
+                      <div class="product-info">
+                        <div class="product-name">{{ product.Type_Name }}</div>
+                      </div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-col>
+            </el-row>
+            <el-col :span="5" :offset="9">
+              <!-- 使用分页组件 -->
+              <el-pagination background layout="prev, pager, next" :total="totalPages * 10" v-model="currentPage"
+                @current-change="handlePageChange" />
+            </el-col>
+          </el-main>
         </el-container>
-    </el-container>
-    <!--导航栏部分-->
-</template>
-
-<script>
-import header from '../components/header.vue'
-import { ref } from 'vue'
-export default {
+      </el-container>
+    </div>
+  </template>
+  
+  <script>
+  import { ref } from 'vue';
+  import header from '../components/header.vue';
+  import { pictureget } from '@/api/picture';
+  
+  export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "evaluatepage",
-
+  
     data() {
-        return {
-            key: undefined,
-            list: [
-                { id: 1, },
-                { id: 2, },
-                { id: 3, },
-                { id: 4, },
-                { id: 5, },
-                { id: 6, },
-                { id: 7, },
-                { id: 8, },
-            ],
-            currentDate: ref(new Date()),
-
-        }
+      return {
+        images: [],
+        activeIndex: ref('1'),
+        products: [],
+        currentPage: 1,
+        totalPages: 0,
+        selectedBrand: '',
+      };
     },
     components: {
-        
-        "seach": header,
+      "seach": header,
     },
     methods: {
-        change(key) {
-            this.key = key;
-            console.log(this.key);
-        },
-        goToDetailsPage() {
-        console.log("到这")
-        this.$router.push({ name: 'DetailsPage' });
-        }
+      handlePageChange(currentPage) {
+        this.currentPage = currentPage;
+      },
+      goToDetailsPage(productId) {
+        this.$router.push({ name: 'DetailsPage', params: { productId: productId } });
+      },
+      selectBrand(brand) {
+        this.selectedBrand = brand;
+        this.currentPage = 1; // Reset current page when selecting a new brand
+      },
+      calculateTotalPages() {
+        const itemsPerPage = 6;
+        this.totalPages = Math.ceil(this.paginatedProducts.length / itemsPerPage);
+      },
     },
-    
-}
-</script>
+    computed: {
+      paginatedProducts() {
+        return this.products.filter(product => {
+          return product.Brand === this.selectedBrand;
+        });
+      },
+    },
+    mounted() {
+    pictureget().then((res) => {
+      if (res.data === false) {
+        this.$message.error("获得失败");
+      } else {
+        this.$message.success("获得成功");
+        console.log("获得成功");
+        console.log(res.data);
+        this.products = res.data.DeviceType;
+        this.images = res.data.DeviceType;
+        console.log("products");
+        console.log(this.products);
+        this.calculateTotalPages(); // 在数据加载完成后计算总页数
+      }
+    });
+  },
+  };
+  </script>
+  
+  <style scoped>
 
-
-<style scoped>
-.time {
-    font-size: 12px;
-    color: #999;
-}
-
-.bottom {
-    margin-top: 13px;
-    line-height: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.button {
-    padding: 0;
-    min-height: auto;
-}
-
-.image {
-    width: 100%;
-    display: block;
-}
-
-.el-row {
+  
+  .recommend-products {
     margin-bottom: 20px;
-}
-
-.type {
-    flex-grow: 1;
-}
-</style>
-
+  }
+  
+  .product-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .product-card img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+  }
+  
+  .product-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .product-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  </style>

@@ -1,7 +1,7 @@
 <template>
 <div>
     <seach />
-
+   
 
     <!-- <el-steps :active="1" class="centered-steps">
         <el-step title="预览" description="选择您的设备" />
@@ -11,6 +11,7 @@
     </el-steps> -->
     <el-header style="margin-top: 20px;">
         <el-steps :active="1" align-center>
+    <el-button type="primary" :icon="ArrowLeft" @click="goBack">返回</el-button>
     <el-step title="Step 1" description="Some description" />
     <el-step title="Step 2" description="Some description" />
     <el-step title="Step 3" description="Some description" />
@@ -97,12 +98,13 @@
   <script>
   import header from '/src/components/header.vue'
   import { pictureget } from '@/api/detail.js';//获取图片
-  import { getdevicedata } from '@/api/detail.js'; // 导入API请求函数
+  // import { getdevicedata } from '@/api/detail.js'; // 导入API请求函数
   export default {
     name:'DetailsPage',
     data() {
       return {
         product: {
+          productId:null,
           type:'Phone',
           name: 'iphone11',
           description: '高性能手机',
@@ -124,7 +126,74 @@
         ]
         }, 
         Product:[],
+        previousPage: 'mainpage',
       };
+    },
+    beforeRouteEnter(to, from, next) {
+    next(vm => {
+      // Call the updatePreviousPage method on the component instance to update the previousPage value
+      vm.updatePreviousPage(from);
+    });
+    },
+
+    beforeRouteUpdate(to, from, next) {
+      // Call the updatePreviousPage method to update the previousPage value when the route is updated
+      this.updatePreviousPage(from);
+      next();
+    },
+    mounted() {
+    // 接收上一个组件的值，并将其赋给data.product.productId
+      console.log(this.$route.params.productId);
+      this.product.productId = this.$route.params.productId;
+      console.log("产品");
+    },
+    created() {
+      //先get了图片
+      pictureget().then((res) => {
+      if (res.data === false) {
+        this.$message.error("获得失败");
+      } else {
+        console.log(res.data);
+        this.$message.success("获得成功");
+        this.products = res.data.DeviceType; // 直接使用API响应的数据
+        this.currentimageUrl = res.data.DeviceType; // 直接使用API响应的数据
+        console.log(this.currentimageUrl);
+      }
+      }).catch((error) => {
+        console.error("获取图片数据时出现错误:", error);
+      });
+      this.updatePreviousPage();
+      // getdevicedata()
+      // .then((response) => {
+        // Assuming the response.data contains the device data object
+        // const deviceData = response.data;
+
+        // Adjust the params object according to your needs
+        // const params = {
+        //   cate: deviceData.type,
+        //   name: deviceData.name,
+        //   Description: deviceData.description,
+        //   Price: deviceData.price,
+        //   Img: deviceData.currentimageUrl,
+        //   ImgList: deviceData.imageList, // An array of image URLs
+        // };
+
+      // Now you can use the 'params' object for further processing or manipulation
+      // For example, you can pass it to another function or store it in the component's state
+      
+
+      // ... do other things with 'params'
+      // })
+        // .catch((error) => {
+        //   console.error('Error fetching device data:', error);
+        // });
+        
+      },
+    watch:{
+      activeIndex(newIndex) {
+        this.product.currentimageUrl = this.product.imageList[newIndex].url;
+      },
+    
     },
     methods: {
       goToRecyclePage() {
@@ -139,59 +208,32 @@
         this.product.currentimageUrl = imageUrl;
         this.activeIndex = this.product.imageList.findIndex(image => image.url === imageUrl);
       },
-      fetchDeviceDataFromBackend() {
-      
+      // 修改updatePreviousPage方法，根据来源页面的路由信息来更新previousPage
+      updatePreviousPage(fromRoute) {
+        this.previousPage = fromRoute || 'mainpage';
+      },
 
-      
-    },
-    watch:{
-      activeIndex(newIndex) {
-        this.product.currentimageUrl = this.product.imageList[newIndex].url;
+    // 修改goBack方法，根据previousPage信息进行导航
+    goBack() {
+      // 根据previousPage的值来决定导航的目标页面
+      if (this.previousPage === "evaluatepage") {
+        // 如果来源页面是evaluatepage，则导航回evaluatepage
+        this.$router.push({ name: "evaluatepage" });
+      } else if (this.previousPage === "mainpage") {
+        // 如果来源页面是mainpage，则导航回mainpage
+        this.$router.push({ name: "mainpage" });
+      } else {
+        // 其他情况，采取默认导航行为，可能是直接进入DetailsPage的情况
+        this.$router.go(-1);
       }
     },
+      
+     
+    
     components: {
         "seach": header,
     },
-    created() {
-      //先get了图片
-      pictureget().then((res) => {
-        if (res.data === false) {
-          this.$message.error("获得失败");
-        }
-        else {
-          console.log(res.data)
-          this.$message.success("获得成功");
-          this.products=JSON.parse(res.data.DeviceType)
-          this.currentimageUrl=JSON.parse(res.data.DeviceType)
-          console.log(this.currentimageUrl)
-        }
-      }),
-
-      getdevicedata()
-      .then((response) => {
-        // Assuming the response.data contains the device data object
-        const deviceData = response.data;
-
-        // Adjust the params object according to your needs
-        const params = {
-          cate: deviceData.type,
-          name: deviceData.name,
-          Description: deviceData.description,
-          Price: deviceData.price,
-          Img: deviceData.currentimageUrl,
-          ImgList: deviceData.imageList, // An array of image URLs
-        };
-
-    // Now you can use the 'params' object for further processing or manipulation
-    // For example, you can pass it to another function or store it in the component's state
-        console.log('Fetched device data:', params);
-
-    // ... do other things with 'params'
-  })
-  .catch((error) => {
-    console.error('Error fetching device data:', error);
-  });
-      },
+    
     }
   };
   </script>

@@ -88,13 +88,27 @@
                 <el-input type="textarea" v-model="form.problemDescription"></el-input>
               </el-descriptions-item>
               <el-descriptions-item label="工程师名称" label-align="center" align="center">
-                <el-select v-model="form.engineer" placeholder="请选择工程师">
-                  <el-option label="工程师A" value="engineerA"></el-option>
-                  <el-option label="工程师B" value="engineerB"></el-option>
-                  <el-option label="工程师C" value="engineerC"></el-option>
-                  <!-- 可按需添加更多选项 -->
-                </el-select>
-              </el-descriptions-item>
+                  <el-popover v-if="form.engineer" trigger="hover" placement="right-start" width="200">
+                    <template #reference>
+                      <el-select v-model="form.engineer" placeholder="请选择工程师" @mouseover="showPopoverContent = true" @mouseleave="showPopoverContent = false">
+                        <el-option label="工程师A" value="engineerA" ></el-option>
+                        <el-option label="工程师B" value="engineerB" ></el-option>
+                        <el-option label="工程师C" value="engineerC" ></el-option>
+                      </el-select>
+                    </template>
+                    <div v-if="showPopoverContent">
+                      <h4>{{ selectedEngineer.name }}</h4>
+                      <p>性别: {{ selectedEngineer.sex }}</p>
+                      <p>评分: {{ selectedEngineer.rating }}</p>
+                      <p>工龄: {{ selectedEngineer.experience }}</p>
+                    </div>
+                  </el-popover>
+                  <el-select v-else v-model="form.engineer" placeholder="请选择工程师">
+                    <el-option label="工程师A" value="engineerA"></el-option>
+                    <el-option label="工程师B" value="engineerB"></el-option>
+                    <el-option label="工程师C" value="engineerC"></el-option>
+                  </el-select>
+                </el-descriptions-item>
             </el-descriptions>
           </div>
         </el-main>
@@ -119,6 +133,9 @@
 
 <script>
 import { repair_info } from '@/api/repair_info.js'
+import { getEngineer } from '@/api/repair_info.js';
+
+
 export default {
   name: 'RepairPage',
   data() {
@@ -131,17 +148,55 @@ export default {
         appearance: '',
         display: '',
         repair: '',
-        photo: null // 用于存储选择的照片文件
-      }
+        photo: null, // 用于存储选择的照片文件
+      },
+      showPopoverContent: false,
+      selectedEngineer: null,
+      engineersData: [
+        { value: "engineerA", name: "小盛", sex: "男", rating: 4.1, experience: "5年" },
+        { value: "engineerB", name: "老默", sex: "男", rating: 4.9, experience: "3年" },
+        { value: "engineerC", name: "小兰", sex: "女", rating: 4.7, experience: "7年" },
+      ],
     };
   },
+
+  created() {
+    // 在组件创建时调用getEngineer函数，获取工程师数据
+    this.fetchEngineersData();
+  },
+
+  watch: {
+    'form.engineer': function (newVal) {
+      // 通过工程师的值，查找对应的个人信息并赋值给selectedEngineer
+      this.selectedEngineer = this.engineersData.find((engineer) => engineer.value === newVal);
+      // 控制个人名片是否显示的标志
+      this.showPopoverContent = !!this.selectedEngineer;
+    }
+  },
+
+
   methods: {
+
+
+
+
     showSiteDetails() {
       // Implement the functionality for the "维修站点详情" button
       // For example, you can redirect to a new page or show a modal with site details
       // Replace the code below with your actual implementation
       console.log('Showing site details');
     },
+
+    
+    fetchEngineersData() {
+      // 调用getEngineer函数获取工程师数据
+      getEngineer({}).then((response) => {
+        this.engineersData = response.data; // 将获取到的工程师数据赋值给engineersData
+      }).catch((error) => {
+        console.error('Error fetching engineers data:', error);
+      });
+    },
+
 
     handleFileUpload(event) {
       const file = event.target.files[0];
@@ -329,3 +384,6 @@ export default {
 }
 
   </style>
+
+
+

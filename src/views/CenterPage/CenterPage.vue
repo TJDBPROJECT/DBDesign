@@ -69,7 +69,8 @@ export default {
     };
   },
   mounted() {
-    this.getDataFromServer();
+    this.generateData();
+    //this.getDataFromServer();
   },
   methods: {
     getDataFromServer() {

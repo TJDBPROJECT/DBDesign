@@ -211,18 +211,21 @@ const iconStyle = computed(() => {
 })
 
 export default {
-    create() {
+    created() {
         console.log("尝试拿到个人信息")
-        //请求地址,this和vm指的是全局
-        getUserProfile().then((res) => {
-            console.log(res.data)
-            if (res.data === false) {
-                console.log("拿数据失败")
-            }
-            else {
-                console.log("拿数据成功")
-            }
-        })
+        const UserID = '99999'; // 假设用户ID是 '99999'
+        getUserProfile(UserID)
+            .then((res) => {
+                // 处理返回的用户个人资料数据
+                console.log("拿数据成功");
+                console.log('Response Data:', res.data); // 打印获取到的数据
+                this.userInfo = res.data; // 将获取到的数据存储到userInfo中
+            })
+            .catch((error) => {
+                // 处理错误
+                console.log("拿数据失败");
+                console.error('Error:', error); // 打印错误信息
+            });
     },
     data() {
         return {
@@ -231,16 +234,14 @@ export default {
             editSignature: false,
             avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
             signature: "暂未设置个性签名！",
-            username: "John Doe",
             userInfo: {// 用户信息...
-                id: "123",
-                username: "John Doe",
-                userlevel:1, 
-                name:"小李觉",
-                telephone: "18888886666",
-                email: "johndoe@example.com",
-                identity:"111111111111",
-
+                id: "",
+                username: "",
+                userlevel: "",
+                name: "",
+                telephone: "",
+                email: "",
+                identity: "",
             },
             editedUserInfo: {
 
