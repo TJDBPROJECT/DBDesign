@@ -103,16 +103,25 @@
         
       </el-collapse>
       <br><br><br><br><br><br><br><br><br><br>
-      <el-text class="mx-1" type="primary" style="font-size: 20px;" @click="signOut">退出登录</el-text>
+      <ElButton type="primary" class="login-btn" size="large" @click="signOut">退出登录</ElButton>
     </div>
 
   </div>
 </template>
 
 <script>
+import { mapState} from 'vuex';
 export default {
+  computed:{
+    ...mapState(['userid']), // 获取 userid 数据
+    test()
+    {
+      return this.userid;
+    }
+  },
   data() {
     return {
+  
       showButton: true,
       editMode: false,
       formData: {
@@ -193,6 +202,7 @@ export default {
     },
     signOut()
     {
+      console.log(this.userid)
       this.$router.push('/')
     }
   },

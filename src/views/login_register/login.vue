@@ -20,9 +20,13 @@
 import { login } from '@/api/login.js'
 import { code } from '@/api/login.js'
 import * as icons from '@element-plus/icons-vue';
+import { mapState, mapActions } from 'vuex';
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Login",
+  computed:{
+    ...mapState(['userid']), // 获取 userid 数据
+  },
   data() {
     return {
       icons: icons,
@@ -79,9 +83,11 @@ export default {
     signUp() {
       this.$router.push('/mainpage')
     },
+    ...mapActions(['updateUserId']), 
     // 提交表单
     submitForm() {
       console.log("点击了登录键")
+      this.updateUserId(this.loginForm.userid);
       this.$router.push('/mainpage')
       //请求地址,this和vm指的是全局
       let params ={
@@ -101,6 +107,7 @@ export default {
         }
       })
     },
+
   },
   created() {
       console.log("尝试拿到验证码")
