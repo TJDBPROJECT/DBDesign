@@ -16,7 +16,7 @@ const routes = [
   {
     path: '/',
     name: 'loginMain',
-    component:loginMain
+    component: loginMain
   },
   {
     path: '/mainpage',
@@ -50,7 +50,18 @@ const routes = [
       {//我的订单
         path: '/OrderCenter',
         name: 'OrderCenter',
-        component: () => import(/*webpackChunkName:'OOrderCenter'*/ '../views/home/OrderCenter/OrderCenter.vue')
+        children: [
+          {//回收订单
+            path: '/RecycleCenter',
+            name: 'RecycleCenter',
+            component: () => import(/*webpackChunkName:'RecycleCenter'*/ '../views/home/OrderCenter/RecycleCenter.vue')
+          },
+          {//维修订单
+            path: '/RepairCenter',
+            name: 'RepairCenter',
+            component: () => import(/*webpackChunkName:'RepairCenter'*/ '../views/home/OrderCenter/RepairCenter.vue')
+          },
+        ]
       },
       {//我的邮寄地址
         path: '/MyAddress',
@@ -65,8 +76,8 @@ const routes = [
     ]
   },
 
-   {//查看商品详情
-    path: '/DetailsPage',
+  {//查看商品详情
+    path: '/DetailsPage/:productId',
     name: 'DetailsPage',
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/DetailsPage.vue')
   },
@@ -77,17 +88,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
 
   },
-  // {
-
-  //   path: '/RecoveryPage',
-  //   name: 'RecoveryPage',
-  //   component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
-  // },
-
 
 
   {
-    path: '/repairpage',
+    path: '/repairpage/:productId',
     name: 'repairpage',
     component: RepairPage
   },

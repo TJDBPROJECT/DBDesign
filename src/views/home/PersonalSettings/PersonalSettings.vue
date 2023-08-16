@@ -111,6 +111,8 @@
 
 <script>
 import { mapState} from 'vuex';
+import { getInfo, sendInfo } from '@/api/personalSettings';
+
 export default {
   computed:{
     ...mapState(['userid']), // 获取 userid 数据
@@ -121,7 +123,7 @@ export default {
   },
   data() {
     return {
-  
+
       showButton: true,
       editMode: false,
       formData: {
@@ -164,6 +166,25 @@ export default {
       // 执行保存修改的操作，比如向后端发送请求
       this.editMode = false;
       this.showButton = !this.showButton;
+      let params = {
+      name :this.formData.name,
+      username:this.formData.username,
+      phone:this.formData.phone,
+      email:this.formData.email,
+      identity:this.formData.identify
+    }
+
+    console.log(params)
+    sendInfo(params , this.userid).then((res) => {
+        if (res.data === false) {
+          this.$message.error("保存失败");
+          
+        }
+        else {
+          this.$message.success("保存成功");
+         
+        }
+      })
     },
     cancel() {
       // 取消修改，恢复原始数据
@@ -206,7 +227,25 @@ export default {
       this.$router.push('/')
     }
   },
-
+  created(){
+    console.log("尝试获取个人信息")
+      //请求地址,this和vm指的是全局
+      getInfo(this.userid).then((res) => {
+        console.log(res.data)
+        if (res.data === false) {
+          console.log("拿数据失败")
+        }
+        else {
+          console.log("拿数据成功")
+          console.log(res.data[0].email)
+          this.formData.name = res.data[0].name
+          this.formData.username= res.data[0].userName
+          this.formData.phone= res.data[0].telephone
+          this.formData.email=res.data[0].email
+          this.formData.identify= res.data[0].identity
+        }
+      })
+  }
 };
 </script>
 

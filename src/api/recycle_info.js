@@ -6,24 +6,19 @@ export function pictureget() {
     method: 'get',
   })
 }
-
-/*回收订单信息*/
-export function recycle_info(params) {
+/*创建回收订单信息*/
+export function createRecycleOrder() {
   return request({
-    url: '/RecycleOrder',
+    url: `http://110.42.220.245:8081/RecycleOrder/{id}`,
     method: 'post',
-    params: {
-      device_cate: params.device_cate,
-      device_type: params.device_type,
-      expectedprice: params. ExpectedPrice,
-      recycle_location: params.Recycle_Location,
-      recycle_time: params.Recycle_Time,
-    }
-  })
+    data: {
+      Device_Cate:"phone",
+    Device_Type:"iPhone6",
+    ExpectedPrice:100,
+    Recycle_Location:"home",
+    Recycle_Time:"2023-08-10T15:25:00"
+
+    },
+  });
 }
 
-// “device_cate”:string,
-// “device_type”:string,
-// “ExpectedPrice”:float,
-// “Recycle_Location”:string,
-// “Recycle_Time”:DateTime

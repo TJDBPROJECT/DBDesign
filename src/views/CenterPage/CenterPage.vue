@@ -5,32 +5,37 @@
       <div class="container">
         <el-scrollbar class="scrollbar" :height="containerHeight">
           <div class="scrollbar-container">
-            <el-card v-for="item in data" :key="item.id" class="card-item">
+            <el-card v-for="center in data" :key="center.id" class="card-item">
               <div class="card-content">
                 <div class="card-left">
                   <img
-                    :src="item.image"
+                    :src="center.TIMG_URL"
                     class="card-image"
-                    @mouseover="hoverImage(item.id, true)"
-                    @mouseleave="hoverImage(item.id, false)"
+                    @mouseover="hoverImage(center.id, true)"
+                    @mouseleave="hoverImage(center.id, false)"
                   />
                   <el-button class="card-button" type="primary">详情</el-button>
                 </div>
                 <div class="card-right">
-                  <el-descriptions title="Customized style list" :column="1" border>
-                    <el-descriptions-item label="ID" label-align="right" align="center">{{ item.id }}</el-descriptions-item>
-                    <el-descriptions-item label="Name" label-align="right" align="center">{{ item.name }}</el-descriptions-item>
-                    <el-descriptions-item label="Location Detail" label-align="right" align="center">{{ item.loc_detail }}</el-descriptions-item>
-                    <el-descriptions-item label="Telephone" label-align="right" align="center">{{ item.tel }}</el-descriptions-item>
+                  <el-descriptions title="Centers Details" :column="1" border>
+                    <el-descriptions-item label="ID" label-align="right" align="center">{{ center.ID }}</el-descriptions-item>
+                    <el-descriptions-item label="Name" label-align="right" align="center">{{ center.Name }}</el-descriptions-item>
+                    <el-descriptions-item label="Location Detail" label-align="right" align="center">{{ center.Loc_Detail }}</el-descriptions-item>
+                    <el-descriptions-item label="Telephone" label-align="right" align="center">{{ center.Tel }}</el-descriptions-item>            
                   </el-descriptions>
+                  <!-- <p>{{ data }}</p> -->
                 </div>
               </div>
             </el-card>
           </div>
         </el-scrollbar>
         <div class="map-container">
-          <BaiduMap :locations="mapLocations" />
+          <!-- <BaiduMap :locations="mapLocations" /> -->
+          <!-- <p>{{ mapLocations }}</p> -->
+          <BaiduMap v-if="dataLoaded" :locations="mapLocations" />
+          
         </div>
+
       </div>
     </div>
     <div class="back-button-container">
@@ -42,21 +47,23 @@
 <script>
 import Header from '/src/components/header.vue';
 import BaiduMap from '/src/components/BaiduMap.vue';
-import { getData } from '@/api/centerpicture.js'; // 导入API请求函数
-
+import { getAllServiceCenters } from '@/api/centerpicture'; // Import the API function to fetch service center data
 
 export default {
   computed: {
     containerHeight() {
       return `${window.innerHeight - 100}px`;
     },
+
+
     mapLocations() {
-      return this.data.map((item) => ({
-        name: item.location,
-        lng: this.getGeolocation(item.location).lng,
-        lat: this.getGeolocation(item.location).lat,
+      return this.data.map((center) => ({
+        name: center.Loc_Detail,
+        lng: center.Longitude,//this.getGeolocation(center.Loc_Detail).lng,
+        lat: center.Latitude,//this.getGeolocation(center.Loc_Detail).lat,
       }));
     },
+
   },
   components: {
     search: Header,
@@ -64,78 +71,56 @@ export default {
   },
   data() {
     return {
-      //data: [],
-      data: [], // 存储Customized style list信息的数组
+      data: [], // Store the fetched service center data
+      dataLoaded: false, // Flag to track if data has been loaded
     };
   },
   mounted() {
-    this.generateData();
-    //this.getDataFromServer();
+    this.fetchServiceCenterData(); // Fetch service center data from the server
   },
   methods: {
-    getDataFromServer() {
-      getData().then((res) => {
-        this.data = res.data; // 假设返回的数据为一个数组，直接将数据赋值给data
-      }).catch((error) => {
-        console.error('获取数据失败:', error);
-      });
-    },
-
-
     CenterPageGoBack() {
       this.$router.push({ name: 'repairpage' });
     },
-    //服务中心页面的返回键 
 
-    generateData() {
-      // Generate 20 different data items and assign them to the `data` array
-      const cities = [
-        '北京',
-        '上海',
-        '广州',
-        '深圳',
-        '杭州',
-        '成都',
-        '重庆',
-        '武汉',
-        '南京',
-        '西安',
-        '天津',
-        '苏州',
-        '长沙',
-        '郑州',
-        '青岛',
-        '大连',
-        '宁波',
-        '厦门',
-        '哈尔滨',
-        '济南',
-      ];
 
-      for (let i = 1; i <= 20; i++) {
-        this.data.push({
-          id: i,
-          image: `image-${i}.jpg`,
-          name: `User ${i}`,
-          // rating: (Math.random() * 5).toFixed(1),
-          location: cities[i - 1],
-          loc_detail: cities[i - 1], //`Location Detail ${i}`,
-          tel: `Telephone ${i}`,
-        });
+
+    // async fetchServiceCenterData() {
+    //   try {
+    //     const response = await getAllServiceCenters();
+    //     console.log('Fetched data:', response.data); // 输出获取到的数据
+    //     this.data = response.data.ServiceCenter;
+    //   } catch (error) {
+    //     console.error('Error fetching service center data:', error);
+    //   }
+    // }
+    // async fetchServiceCenterData() {
+    //   try {
+    //     const response = await getAllServiceCenters();
+    //     this.data = response.data.ServiceCenter;
+    //   } catch (error) {
+    //     console.error('Error fetching service center data:', error);
+    //   }
+    // },
+    // async fetchServiceCenterData() {
+    //   try {
+    //     const response = await getAllServiceCenters(); // 调用 API 获取服务中心数据
+    //     this.data = response.data.ServiceCenter; // 将获取的数据赋值给 this.data
+    //   } catch (error) {
+    //     console.error('Error fetching service center data:', error);
+    //   }
+    // },
+
+    async fetchServiceCenterData() {
+      try {
+        const response = await getAllServiceCenters();
+        this.data = response.data.ServiceCenter;
+        this.dataLoaded = true; // Set the flag to true after data is loaded
+      } catch (error) {
+        console.error('Error fetching service center data:', error);
       }
     },
-    getGeolocation(address) {
-      // Perform geocoding here and return the latitude and longitude
-      // Replace this function with the actual geocoding logic using Baidu Map API or any other geocoding service
-      // The example below shows a hardcoded geolocation for demonstration purposes
-      const geolocation = {
-        北京: { lat: 39.9042, lng: 116.4074 },
-        上海: { lat: 31.2304, lng: 121.4737 },
-        广州: { lat: 23.1291, lng: 113.2644 },
-        // Add geolocation coordinates for other cities
-      };
-      return geolocation[address] || { lat: 0, lng: 0 }; // Return (0,0) for unknown addresses
-    },
+
     hoverImage(id, isHover) {
       const cardImage = document.getElementById(`card-image-${id}`);
       if (cardImage) {
@@ -143,8 +128,12 @@ export default {
       }
     },
 
+
+    // Rest of the methods remain the same
   },
 };
+
+
 </script>
 
 <style scoped>
@@ -166,8 +155,12 @@ export default {
 
 .card-item {
   margin-bottom: 10px; /* 调整卡片之间的间距 */
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-}
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);/*  添加阴影效果 */
+ }
+
+
+
+
 
 .card-content {
   display: flex;
@@ -186,12 +179,49 @@ export default {
   padding-left: 20px;
 }
 
+
+
+
+.card-right {
+  flex: 2;
+  padding-left: 20px;
+  width: 300px; /* 设置固定宽度 */
+}
+
+.el-descriptions {
+  width: 100%; /* 让表格宽度占满容器 */
+}
+
+.el-descriptions-item {
+  display: flex;
+  justify-content: 50px; /* 设置标签和内容之间的间距 */
+}
+
+.el-descriptions-item__label {
+  flex: 1; /* 标签占据左侧宽度 */
+  text-align: right;
+  padding-right: 10px; /* 右侧留出一些间距 */
+}
+
+.el-descriptions-item__content {
+  flex: 2; /* 内容占据右侧宽度 */
+  text-align: left;
+}
+
+
+
+
 .card-image {
   width: 200px;
   height: 200px;
   object-fit: cover;
   transition: filter 0.3s ease-in-out;
 }
+
+
+
+
+
 
 .card-button {
   margin-top: 12px;
@@ -224,199 +254,3 @@ export default {
   height: 40px;
 }
 </style>
-
-
-<!-- <template>
-
-    <div>
-      <search/>
-      <div>
-        <div class="container">
-          <el-scrollbar class="scrollbar" :height="containerHeight">
-            <div class="scrollbar-container">
-              <el-card v-for="item in data" :key="item.id" class="card-item">
-                <div class="card-content">
-                  <div class="card-left">
-                    <img
-                      :src="item.image"
-                      class="card-image"
-                      @mouseover="hoverImage(item.id, true)"
-                      @mouseleave="hoverImage(item.id, false)"
-                    />
-                    <el-button class="card-button" type="primary">详情</el-button>
-                  </div>
-                  <div class="card-right">
-                    <el-descriptions title="Customized style list" :column="1" border>
-                      <el-descriptions-item label="ID" label-align="right" align="center">{{ item.id }}</el-descriptions-item>
-                      <el-descriptions-item label="Name" label-align="right" align="center">{{ item.name }}</el-descriptions-item>
-                      <el-descriptions-item label="Location Detail" label-align="right" align="center">{{ item.loc_detail }}</el-descriptions-item>
-                      <el-descriptions-item label="Telephone" label-align="right" align="center">{{ item.tel }}</el-descriptions-item>
-                    </el-descriptions>
-                  </div>
-                </div>
-              </el-card>
-            </div>
-          </el-scrollbar>
-          <div class="map-container">
-            <BaiduMap :locations="mapLocations" />
-          </div>
-        </div>
-      </div>
-    </div>
-</template>
-  
-<script>
-  import Header from '/src/components/header.vue'
-  import BaiduMap from '/src/components/BaiduMap.vue';
-  
-  export default {
-    computed: {
-      containerHeight() {
-        return `${window.innerHeight - 100}px`;
-      },
-      mapLocations() {
-        return this.data.map(item => ({
-          name: item.location,
-          lng: this.getGeolocation(item.location).lng,
-          lat: this.getGeolocation(item.location).lat
-        }));
-      }
-    },
-    components: {
-      search: Header,
-      BaiduMap,
-    },
-    data() {
-      return {
-        data: [],
-      };
-    },
-    mounted() {
-      this.generateData();
-    },
-    methods: {
-      generateData() {
-        // Generate 20 different data items and assign them to the `data` array
-        const cities = [
-          "北京",
-          "上海",
-          "广州",
-          "深圳",
-          "杭州",
-          "成都",
-          "重庆",
-          "武汉",
-          "南京",
-          "西安",
-          "天津",
-          "苏州",
-          "长沙",
-          "郑州",
-          "青岛",
-          "大连",
-          "宁波",
-          "厦门",
-          "哈尔滨",
-          "济南",
-        ];
-  
-        for (let i = 1; i <= 20; i++) {
-          this.data.push({
-            id: i,
-            image: `image-${i}.jpg`,
-            name: `User ${i}`,
-            // rating: (Math.random() * 5).toFixed(1),
-            location: cities[i - 1],
-            loc_detail: cities[i - 1],//`Location Detail ${i}`,
-            tel: `Telephone ${i}`
-          });
-        }
-      },
-      getGeolocation(address) {
-        // Perform geocoding here and return the latitude and longitude
-        // Replace this function with the actual geocoding logic using Baidu Map API or any other geocoding service
-        // The example below shows a hardcoded geolocation for demonstration purposes
-        const geolocation = {
-          北京: { lat: 39.9042, lng: 116.4074 },
-          上海: { lat: 31.2304, lng: 121.4737 },
-          广州: { lat: 23.1291, lng: 113.2644 },
-          // Add geolocation coordinates for other cities
-        };
-        return geolocation[address] || { lat: 0, lng: 0 }; // Return (0,0) for unknown addresses
-      },
-      hoverImage(id, isHover) {
-        const cardImage = document.getElementById(`card-image-${id}`);
-        if (cardImage) {
-          cardImage.style.filter = isHover ? 'brightness(70%)' : 'none';
-        }
-      },
-    },
-  };
-</script>
-  
-  <style scoped>
-  .container {
-    display: flex;
-  }
-  
-  .scrollbar {
-    flex: 1;
-    height: calc(100vh - 100px); /* 调整滚动框高度，保留页眉高度 */
-    margin-right: 20px; /* 调整滚动框与地图的间距 */
-  }
-  
-  .scrollbar-container {
-    width: 1000px; /* 设置容器宽度为 1000px */
-    height: 100%;
-    overflow-y: auto;
-  }
-  
-  .card-item {
-    margin-bottom: 10px; /* 调整卡片之间的间距 */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-  }
-  
-  .card-content {
-    display: flex;
-    align-items: center;
-  }
-  
-  .card-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .card-right {
-    flex: 2;
-    padding-left: 20px;
-  }
-  
-  .card-image {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    transition: filter 0.3s ease-in-out;
-  }
-  
-  .card-button {
-    margin-top: 12px;
-  }
-  
-  .my-label {
-    background: var(--el-color-success-light-9);
-  }
-  
-  .my-content {
-    background: var(--el-color-danger-light-9);
-  }
-  
-  .map-container {
-    width: 600px;
-    height: 850px;
-    border: 2px solid #ccc; /* Add a border style */
-    border-radius: 5px; /* Optional: Add border radius */
-    padding: 10px; /* Optional: Add padding */
-  }
-  </style>-->

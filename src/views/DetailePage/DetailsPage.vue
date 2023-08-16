@@ -1,14 +1,6 @@
 <template>
 <div>
     <seach />
-   
-
-    <!-- <el-steps :active="1" class="centered-steps">
-        <el-step title="预览" description="选择您的设备" />
-        <el-step title="回收" description="设备信息" />
-        <el-step title="选择" description="Some description" />
-        <el-step title="成功！" description="Some description" />
-    </el-steps> -->
     <el-header style="margin-top: 20px;">
         <el-steps :active="1" align-center>
     <el-button type="primary" :icon="ArrowLeft" @click="goBack">返回</el-button>
@@ -51,7 +43,7 @@
   
           <template #header>
             <div class="card-header">
-              <h2 class="product-name">{{ product.name }}</h2>
+              <h2 class="product-name">{{ product.productId }}</h2>
             </div>
           </template>
   
@@ -65,8 +57,8 @@
             border
           >
   
-            <el-descriptions-item label="设备类别">{{ product.type }}</el-descriptions-item>
-            <el-descriptions-item label="设备型号">{{ product.name }}</el-descriptions-item>
+            <el-descriptions-item label="设备品牌">{{ deviceInfo && deviceInfo.DeviceType[0].Brand }}</el-descriptions-item>
+            <el-descriptions-item label="设备型号">{{ product.productId }}</el-descriptions-item>
             <el-descriptions-item label="使用时长">两年</el-descriptions-item>
             <el-descriptions-item label="市场价格">{{product.price}}</el-descriptions-item>
   
@@ -96,11 +88,15 @@
 </template>
   
   <script>
+  import axios from 'axios';
   import header from '/src/components/header.vue'
   import { pictureget } from '@/api/detail.js';//获取图片
   // import { getdevicedata } from '@/api/detail.js'; // 导入API请求函数
   export default {
     name:'DetailsPage',
+    components: {
+        "seach": header,
+    },
     data() {
       return {
         product: {
@@ -114,12 +110,8 @@
             { id: 1, url: require('/public/p.jpg') }, // 图片路径根据实际情况进行调整
             { id: 2, url: require('/public/p.jpg') }, 
             { id: 3, url: require('/public/p.jpg') }, 
-            { id: 4, url: require('/public/p.jpg') }, 
-            { id: 5, url: require('/public/p.jpg') } 
           ],
           srcList : [
-          '/public/p.jpg',
-          '/public/p.jpg',
           '/public/p.jpg',
           '/public/p.jpg',
           '/public/p.jpg',
@@ -127,7 +119,14 @@
         }, 
         Product:[],
         previousPage: 'mainpage',
+        deviceInfo: null,
+        type_name: 'Apple',
       };
+    },
+    mounted() {
+    // 接收上一个组件的值，并将其赋给data.product.productId
+      this.product.productId = this.$route.params.productId;
+      console.log("接收的 productId:", this.$route.params.productId);
     },
     beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -141,13 +140,9 @@
       this.updatePreviousPage(from);
       next();
     },
-    mounted() {
-    // 接收上一个组件的值，并将其赋给data.product.productId
-      console.log(this.$route.params.productId);
-      this.product.productId = this.$route.params.productId;
-      console.log("产品");
-    },
     created() {
+      this.getTypename();
+      this.fetchDeviceInfo();
       //先get了图片
       pictureget().then((res) => {
       if (res.data === false) {
@@ -163,30 +158,6 @@
         console.error("获取图片数据时出现错误:", error);
       });
       this.updatePreviousPage();
-      // getdevicedata()
-      // .then((response) => {
-        // Assuming the response.data contains the device data object
-        // const deviceData = response.data;
-
-        // Adjust the params object according to your needs
-        // const params = {
-        //   cate: deviceData.type,
-        //   name: deviceData.name,
-        //   Description: deviceData.description,
-        //   Price: deviceData.price,
-        //   Img: deviceData.currentimageUrl,
-        //   ImgList: deviceData.imageList, // An array of image URLs
-        // };
-
-      // Now you can use the 'params' object for further processing or manipulation
-      // For example, you can pass it to another function or store it in the component's state
-      
-
-      // ... do other things with 'params'
-      // })
-        // .catch((error) => {
-        //   console.error('Error fetching device data:', error);
-        // });
         
       },
     watch:{
@@ -202,7 +173,7 @@
       },
       goToRepairPage() {
         // 进入维修界面的逻辑
-        this.$router.push('/RepairPage');
+        this.$router.push({ name: 'repairpage', params: { productId: this.product.productId } });
       },
       changeImage(imageUrl){
         this.product.currentimageUrl = imageUrl;
@@ -213,26 +184,44 @@
         this.previousPage = fromRoute || 'mainpage';
       },
 
-    // 修改goBack方法，根据previousPage信息进行导航
-    goBack() {
-      // 根据previousPage的值来决定导航的目标页面
-      if (this.previousPage === "evaluatepage") {
-        // 如果来源页面是evaluatepage，则导航回evaluatepage
-        this.$router.push({ name: "evaluatepage" });
-      } else if (this.previousPage === "mainpage") {
-        // 如果来源页面是mainpage，则导航回mainpage
-        this.$router.push({ name: "mainpage" });
-      } else {
-        // 其他情况，采取默认导航行为，可能是直接进入DetailsPage的情况
-        this.$router.go(-1);
-      }
-    },
-      
+      // 修改goBack方法，根据previousPage信息进行导航
+      goBack() {
+        // 根据previousPage的值来决定导航的目标页面
+        console.log(this.previousPage.path)
+        if (this.previousPage.path === '/evaluatepage') {
+          // 如果来源页面是evaluatepage，则导航回evaluatepage
+          this.$router.push({ name: "evaluatepage" });
+        } else if (this.previousPage.path === '/mainpage') {
+          // 如果来源页面是mainpage，则导航回mainpage
+          this.$router.push({ name: "mainpage" });
+        } else {
+          // 其他情况，采取默认导航行为，可能是直接进入DetailsPage的情况
+          this.$router.go(-1);
+        }
+      },
+      getTypename(){
+        this.product.productId = this.$route.params.productId;
+      },
+      fetchDeviceInfo() {
+      axios.get(`http://110.42.220.245:8081/DeviceType/${this.product.productId}`)
+        .then(response => {
+          console.log("到了1")
+          this.deviceInfo = response.data;
+          console.log(this.deviceInfo)
+          // 将图片也更新
+          this.product.imageList = this.deviceInfo.DeviceType[0].Structure_Url.map((url, index) => ({
+          id: index + 1,
+          url: url
+        }));
+        this.product.srcList = this.deviceInfo.DeviceType[0].Structure_Url;
+      })
+        .catch(error => {
+          console.error('请求错误:', error);
+        });
+      },
      
     
-    components: {
-        "seach": header,
-    },
+    
     
     }
   };

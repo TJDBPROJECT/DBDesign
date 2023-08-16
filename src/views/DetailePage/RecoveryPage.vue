@@ -96,7 +96,7 @@
   import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
 
-  import { recycle_info } from '@/api/recycle_info.js'
+  import { createRecycleOrder } from '@/api/repair_info.js'
   
   export default {
 
@@ -134,24 +134,8 @@
       },
       submitForm() {
           this.$router.push({ name: 'recycleprice' });
-          let params = {
-            device_cate: this.form.device_cate,
-            device_type: this.form.device_type,
-            expectedprice: this.form.expectedprice,
-            Recycle_Location: this.form.recycle_location, // Note the capital "R" here, ensure it matches the backend's expected parameter name
-            Recycle_Time: this.form.recycle_time, // Note the capital "R" here, ensure it matches the backend's expected parameter name
-          };
-          recycle_info(params)
-            .then((res) => {
-              // Handle the response if needed
-              console.log(res);
-              // Redirect to the next page after the data has been successfully sent to the backend
-              this.$router.push({ name: 'recycleprice' });
-            })
-            .catch((error) => {
-              // Handle error if needed
-              console.error(error);
-            });
+          
+
       },
       goback() {
         this.$router.push({ name: 'DetailsPage' });
@@ -160,6 +144,41 @@
     handleOptionSelected(option) {
         console.log('选中的存储容量:', option);
         // 在这里处理选中的存储容量
+    },
+    async submitForm() {
+      try {
+        // Construct the data to send to the backend
+        const createdata = {
+          Device_Cate:"phone",
+          Device_Type:"iPhone6",
+          ExpectedPrice:100,
+          Recycle_Location:"home",
+          Recycle_Time:"2023-08-10T15:25:00"
+
+        };
+
+
+        // Call your API function to create the repair order
+        await createRecycleOrder(createdata);
+        
+        // if (createResponse.data.success) {
+        //   console.log('回收订单创建成功:', createResponse.data);
+
+        //   // 获取创建的回收订单信息
+        //   const getOrderResponse = await repair_info({ uid: this.userId }); // 根据需要传入用户ID
+
+        //   console.log('获取回收订单信息:', getOrderResponse.data);
+          
+        //   // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
+        //   // this.$router.push({ name: 'orderDetails', params: { orderId: getOrderResponse.data.orders.OrderID } });
+        // } else {
+        //   console.error('回收订单创建失败:', createResponse.data);
+        //   // 处理订单创建失败的情况，显示错误提示等
+        // }
+      } catch (error) {
+        console.error('Error creating order:', error);
+        // Handle the error as needed
+      }
     },
     components: {
       "seach": header,

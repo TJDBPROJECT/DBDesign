@@ -9,7 +9,6 @@
     </ElFormItem>
     <ElFormItem prop="code">
       <el-input placeholder="请输入验证码" :prefix-icon="icons.QuestionFilled" v-model="loginForm.code" size="large"></el-input>
-      <img :src="imageUrl" alt="图片描述">
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" class="login-btn" size="large" @click="submitForm">登录</ElButton>
@@ -31,7 +30,6 @@ export default {
   data() {
     return {
       icons: icons,
-      imageUrl: "",
       // 表单信息
       loginForm: {
         // 账户数据
@@ -90,7 +88,6 @@ export default {
     submitForm() {
       console.log("点击了登录键")
       this.updateUserId(this.loginForm.userid);
-      this.$router.push('/mainpage')
       //请求地址,this和vm指的是全局
       let params ={
         user: this.loginForm.userid,
@@ -99,8 +96,8 @@ export default {
       console.log(params)
       login(params).then((res) => {
         console.log(res.data)
-        if (res.data.success == false || this.loginForm.code != this.loginForm.codeToken) {
-          this.$message("登录失败")
+        if (res.data === false) {
+          console.log("登录失败")
           this.resetForm();
         }
         else {
@@ -120,10 +117,7 @@ export default {
           console.log("拿数据失败")
         }
         else {
-          this.imageUrl=res.data.CodeImage
-          this.loginForm.codeToken=res.data.CodeToken
           console.log("拿数据成功")
-          console.log(this.code)
         }
       })
     },

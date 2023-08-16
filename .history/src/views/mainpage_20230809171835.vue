@@ -8,7 +8,7 @@
       <el-main>
         <el-carousel :interval="4000" type="card" height="300px" @click="goToDetailsPage">
           <el-carousel-item v-for="(image, index) in images" :key="index">
-            <img :src="image.Structure_Url[1]" alt="轮播图片">
+            <img :src="image.Structure_Url" alt="轮播图片">
           </el-carousel-item>
         </el-carousel>
         <!--日活统计-->
@@ -103,7 +103,7 @@
             <el-col :span="23">
               <el-card shadow="hover" @click="goToDetailsPage(product.Type_Name)">
                 <div class="product-card">
-                  <img :src="product.Structure_Url[0]" alt="product image">
+                  <img :src="product.Structure_Url" alt="product image">
                   <div class="product-info">
                     <div class="product-name">{{ product.Type_Name }}</div>
                   </div>
@@ -116,7 +116,7 @@
         <el-footer>
           <el-col :span="5" :offset="9">
             <!-- 使用分页组件 -->
-            <el-pagination background layout="prev, pager, next" :total="totalPages * 10" v-model="currentPage"
+            <el-pagination background layout="prev, pager, next" :total="totalPages*10" v-model="currentPage"
               @current-change="handlePageChange" />
           </el-col>
         </el-footer>

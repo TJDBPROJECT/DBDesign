@@ -8,7 +8,7 @@
       <el-main>
         <el-carousel :interval="4000" type="card" height="300px" @click="goToDetailsPage">
           <el-carousel-item v-for="(image, index) in images" :key="index">
-            <img :src="image.Structure_Url[1]" alt="轮播图片">
+            <img :src="image.Structure_Url" alt="轮播图片">
           </el-carousel-item>
         </el-carousel>
         <!--日活统计-->

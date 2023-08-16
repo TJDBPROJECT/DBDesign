@@ -7,19 +7,20 @@ export function pictureget() {
   })
 }
 /*获取维修订单信息*/
-export function repairprice_info(params) {
+export function repair_info(params) {
   return request({
-    url: 'RepairOrder/{uid}',
+    url: `/api/RepairOrder/${params.uid}`,
     method: 'get',
     data: {
-        RepairTime:params.RepairTime,
-        CreateTime:params.CreateTime,
-        UserID: params.UserID,
         Username: params.username,
-        OrderPrice:params.OrderPrice,
-        Brand:params.Brand,
+        Telephone: params.telephone,
+        repairlocation: params.repairlacation,
         type_name: params.type_name,
-        RepairLocation: params.RepairLocation,
+        repairtime: params.repairtime,
+        repairrequirement: params.repairrequirement,
+        engineerid: params.engineerid,
+        engineername: params.engineername,
+        photo:"",
     }
   })
 }

@@ -83,14 +83,31 @@
               >
                 <el-input type="textarea" v-model="form.problemDescription"></el-input>
               </el-descriptions-item>
+
+
               <el-descriptions-item label="工程师名称" label-align="center" align="center">
-                <el-select v-model="form.engineer" placeholder="请选择工程师">
-                  <el-option label="工程师A" value="engineerA"></el-option>
-                  <el-option label="工程师B" value="engineerB"></el-option>
-                  <el-option label="工程师C" value="engineerC"></el-option>
-                  <!-- 可按需添加更多选项 -->
+                <el-popover v-if="form.engineer" trigger="hover" placement="right-start" width="200">
+                  <template #reference>
+                    <el-select v-model="form.engineer" placeholder="请选择工程师" @mouseover="showPopoverContent = true" @mouseleave="showPopoverContent = false">
+                      <el-option v-for="engineer in engineersData" :key="engineer.ID" :label="engineer.Name" :value="engineer.ID"></el-option>
+                    </el-select>
+                  </template>
+                  <div v-if="showPopoverContent && selectedEngineer" trigger="hover" placement="right-start" width="200">
+                    
+                      <h4>{{ selectedEngineer.Name }}</h4>
+                      <p>性别: {{ selectedEngineer.Sex }}</p>
+                      <p>评分: {{ selectedEngineer.Rate }}</p>
+                      <p>工龄: {{ selectedEngineer.WorkingYears }}年</p>
+                    </div>
+                  <!-- </el-popover>                       -->
+                </el-popover>
+                <el-select v-else v-model="form.engineer" placeholder="请选择工程师">
+                  <el-option v-for="engineer in engineersData" :key="engineer.ID" :label="engineer.Name" :value="engineer.ID"></el-option>
                 </el-select>
               </el-descriptions-item>
+
+
+
             </el-descriptions>
           </div>
         </el-main>
@@ -114,7 +131,10 @@
 </template>
 
 <script>
-import { repair_info } from '@/api/repair_info.js'
+import { createRepairOrder,repair_info } from '@/api/repair_info.js'
+//import { getEngineer } from '@/api/repair_info.js';
+import axios from 'axios';
+
 export default {
   name: 'RepairPage',
   data() {
@@ -128,14 +148,79 @@ export default {
         display: '',
         repair: '',
         uploadedImages: [], // Store uploaded image URLs
-      }
+      },
+      productId:null,
+      showPopoverContent: false,
+      selectedEngineer: null, // Initialize selectedEngineer
+      engineersData: [], // Store the retrieved engineer data
+      // engineersData: [
+      //   { value: "engineerA", name: "小盛", sex: "男", rating: 4.1, experience: "5年" },
+      //   { value: "engineerB", name: "老默", sex: "男", rating: 4.9, experience: "3年" },
+      //   { value: "engineerC", name: "小兰", sex: "女", rating: 4.7, experience: "7年" },
+      // ],
     };
   },
+  mounted() {
+    // 接收上一个组件的值，并将其赋给data.product.productId
+      this.productId = this.$route.params.productId;
+      console.log("接收的 productId:", this.$route.params.productId);
+      this.fetchEngineersData(); // 在组件挂载时获取工程师数据
+  },
+
+  // created() {
+  //   // 在组件创建时调用getEngineer函数，获取工程师数据
+  //   this.fetchEngineersData();
+  // },
+
+  // watch: {
+  //   'form.engineer': function (newVal) {
+  //     // 通过工程师的值，查找对应的个人信息并赋值给selectedEngineer
+  //     this.selectedEngineer = this.engineersData.find((engineer) => engineer.value === newVal);
+  //     // 控制个人名片是否显示的标志
+  //     this.showPopoverContent = !!this.selectedEngineer;
+  //   }
+  // },
+  watch: {
+  'form.engineer': function (newVal) {
+    this.selectedEngineer = this.engineersData.find(engineer => engineer.ID === newVal);
+  }
+},
+
+
   methods: {
-    handleUploadSuccess(response) {
-      // Assuming the response contains an array of image URLs
-      this.uploadedImages = response.data.imageUrls;
+    onEngineerChange() {
+      this.selectedEngineer = this.engineersData.find(engineer => engineer.ID === this.form.engineer);
+      this.showPopoverContent = !!this.selectedEngineer;
     },
+    async fetchEngineersData() {
+    try {
+      const response = await axios.get('http://110.42.220.245:8081/Engineer');
+      this.engineersData = response.data.engineers; // 使用 response.data.engineers 提取工程师数组
+      console.log('成功获取工程师数据:', this.engineersData);
+    } catch (error) {
+      console.error('获取工程师数据失败:', error);
+    }
+  },
+
+    sendTimeToBackend() {
+      const currentTime = new Date();
+      const formattedTime = currentTime.toISOString(); // You can format the time as needed
+
+      axios.post('/api/time', { currentTime: formattedTime }) // Replace with your API endpoint
+        .then(response => {
+          console.log('后端响应:', response.data);
+          // 根据需要处理后端的响应数据
+        })
+        .catch(error => {
+          console.error('请求错误:', error);
+          // 根据需要处理错误
+          // 输出错误信息
+          console.log('后端返回的错误信息:', error.response.data);
+        });
+    },
+
+
+
     showSiteDetails() {
       // Implement the functionality for the "维修站点详情" button
       // For example, you can redirect to a new page or show a modal with site details
@@ -143,35 +228,65 @@ export default {
       console.log('Showing site details');
     },
 
+    
+    // fetchEngineersData() {
+    //   // 调用getEngineer函数获取工程师数据
+    //   getEngineer({}).then((response) => {
+    //     this.engineersData = response.data; // 将获取到的工程师数据赋值给engineersData
+    //   }).catch((error) => {
+    //     console.error('Error fetching engineers data:', error);
+    //   });
+    // },
+
+
     handleFileUpload(event) {
       const file = event.target.files[0];
       // 将选择的照片文件存储到 data 中的 form.photo
       this.form.photo = file;
     },
-    submitForm() {
-        this.$router.push({ name: 'pricepage' });
-        //请求地址,this和vm指的是全局
-      let params ={
-        username: this.form.name,
-        telephone:this.form.phone,
-        repairlocation:this.form.location,
-        type_name:this.form.deviceName,
-        repairtime:this.form.serviceTime,
-        repairrequirement:this.form.problemDescription,
+   
+    async submitForm() {
+      try {
+        // Construct the data to send to the backend
+        const createdata = {
+          CouponID: "cou123",
+          EngineerID:"eng001",
+          OptionID: "opt123",
+          RepairLocation: "TBD",
+          RepairTime: "2023-08-03T15:31:57",
+        };
+
+        /*const orderData = {
+          username: this.form.name,
+          telephone: this.form.phone,
+          repairlocation: this.form.location,
+          type_name: this.form.deviceName,
+          repairtime: this.form.serviceTime,
+          repairrequirement: this.form.problemDescription,
+          photo: '', // Add the photo data here
+        };*/
+
+        // Call your API function to create the repair order
+        const createResponse = await createRepairOrder(createdata);
+        
+        if (createResponse.data.success) {
+          console.log('维修订单创建成功:', createResponse.data);
+
+          // 获取创建的维修订单信息
+          const getOrderResponse = await repair_info({ uid: this.userId }); // 根据需要传入用户ID
+
+          console.log('获取维修订单信息:', getOrderResponse.data);
+          
+          // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
+          // this.$router.push({ name: 'orderDetails', params: { orderId: getOrderResponse.data.orders.OrderID } });
+        } else {
+          console.error('维修订单创建失败:', createResponse.data);
+          // 处理订单创建失败的情况，显示错误提示等
+        }
+      } catch (error) {
+        console.error('Error creating order:', error);
+        // Handle the error as needed
       }
-      console.log(params)
-      repair_info(params).then((res) => {
-        console.log(res.data)
-        if (res.data === false) {
-          console.log("登录失败")
-          this.resetForm();
-        }
-        else {
-          console.log("登录成功")
-          this.$router.push('/mainpage')
-        }
-      })
-      
     },
     go_center() {
       this.$router.push({ name: 'CenterPage' });
@@ -329,3 +444,6 @@ export default {
 }
 
   </style>
+
+
+

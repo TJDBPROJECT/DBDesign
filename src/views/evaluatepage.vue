@@ -69,7 +69,7 @@
                 <el-col :span="23">
                   <el-card shadow="hover" @click="goToDetailsPage(product.Type_Name)">
                     <div class="product-card">
-                      <img :src="product.Structure_Url" alt="product image">
+                      <img :src="product.Structure_Url[0]" alt="product image">
                       <div class="product-info">
                         <div class="product-name">{{ product.Type_Name }}</div>
                       </div>

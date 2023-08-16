@@ -55,7 +55,7 @@ data() {
       ],
       email: [
         { required: true, message: "请输入邮箱", trigger: "blur" },
-        { min: 6, max: 15, message: "长度在 6 到 15 个字符的密码", trigger: "blur" },
+        { min: 6, max: 20, message: "长度在 6 到 20 个字符的邮箱", trigger: "blur" },
       ],
       // 设置验证码效验规则
       code: [
@@ -76,9 +76,9 @@ methods: {
     var vm = this;
     //请求地址,this和vm指的是全局
     let params = {
-      user: vm. registerForm. username,
-      pass: vm.  registerForm.password,
-      emile: vm. registerForm.email,
+      user_name: this. registerForm.username,
+      password: this.registerForm.password,
+      email: this.registerForm.email,
     }
     console.log(params)
     register(params).then((res) => {

@@ -38,13 +38,16 @@ export function code() {
 /*用户注册*/
 export function register(params) {
   return request({
-    url: '/Login/addnormal',
+    url: '/UserInfo',
     method: 'post',
-    params: {
-      password: params.password,
-      user_name: params.user_name,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+      Password: params.password,
+      UserName: params.user_name,
       Telephone:params.Telephone,
-      email: params.email
+      Email: params.email
     }
   })
 }
