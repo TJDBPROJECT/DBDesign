@@ -1,24 +1,32 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import mainpage from '../views/mainpage.vue'
 import loginMain from '../views/login_register/loginMain'
+import search from '../views/search.vue'
+
+import RepairPage from '../views/DetailePage/repairpage.vue'
+
+import RecyclePrice from '../views/DetailePage/recycleprice.vue'
+import PricePage from '../views/DetailePage/pricepage.vue'
+import PayPage from '../views/DetailePage/paypage.vue'
+import CenterPage from '../views/CenterPage/CenterPage.vue'
+import CenterPageGoBack from '../views/CenterPage/CenterPage.vue'
 
 
-import RepairPage from '../views/home/DetailePage/repairpage.vue'
-import RecyclePrice from '../views/home/DetailePage/recycleprice.vue'
-import PricePage from '../views/home/DetailePage/pricepage.vue'
-import PayPage from '../views/home/DetailePage/paypage.vue'
-import CenterPage from '../views/home/CenterPage/CenterPage.vue'
-import CenterPageGoBack from '../views/home/CenterPage/CenterPage.vue'
 const routes = [
   {
     path: '/',
     name: 'loginMain',
-    component:loginMain
+    component: loginMain
   },
   {
     path: '/mainpage',
     name: 'mainpage',
     component: mainpage
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: search
   },
   {
     path: '/evaluatepage',
@@ -42,39 +50,53 @@ const routes = [
       {//我的订单
         path: '/OrderCenter',
         name: 'OrderCenter',
-        component: () => import(/*webpackChunkName:'OOrderCenter'*/ '../views/home/OrderCenter/OrderCenter.vue')
+        children: [
+          {//回收订单
+            path: '/RecycleCenter',
+            name: 'RecycleCenter',
+            component: () => import(/*webpackChunkName:'RecycleCenter'*/ '../views/home/OrderCenter/RecycleCenter.vue')
+          },
+          {//维修订单
+            path: '/RepairCenter',
+            name: 'RepairCenter',
+            component: () => import(/*webpackChunkName:'RepairCenter'*/ '../views/home/OrderCenter/RepairCenter.vue')
+          },
+        ]
       },
       {//我的邮寄地址
         path: '/MyAddress',
         name: 'MyAddress',
         component: () => import(/*webpackChunkName:'MyAddress'*/ '../views/home/MailAddress/MyAddress.vue')
-      }
+      },
+      {//账户设置
+        path: '/PersonalSettings',
+        name: 'PersonalSettings',
+        component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/PersonalSettings/PersonalSettings.vue')
+      },
+
     ]
   },
-
-   {//查看商品详情
-    path: '/DetailsPage',
+  {//账户设置
+    path: '/mail',
+    name: 'mail',
+    component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/mail.vue')
+  },
+  {//查看商品详情
+    path: '/DetailsPage/:productId',
     name: 'DetailsPage',
-    component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/home/DetailePage/DetailsPage.vue')
+    component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/DetailsPage.vue')
   },
   {//进入回收页
-<<<<<<< HEAD
+
     path: '/recoverypage',
     name: 'recoverypage',
-    component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/home/DetailePage/RecoveryPage.vue')
+    component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
 
   },
 
-=======
-    path: '/RecoveryPage',
-    name: 'RecoveryPage',
-    component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/home/DetailePage/RecoveryPage.vue')
-  },
 
-
->>>>>>> 47f5e6460ec9df49bc9d7b6f7182896a49838c8e
   {
-    path: '/repairpage',
+    path: '/repairpage/:productId',
     name: 'repairpage',
     component: RepairPage
   },
@@ -84,14 +106,13 @@ const routes = [
     component: PricePage
   },
   {
-<<<<<<< HEAD
+
     path: '/recycleprice',
     name: 'recycleprice',
     component: RecyclePrice
   },
   {
-=======
->>>>>>> 47f5e6460ec9df49bc9d7b6f7182896a49838c8e
+
     path: '/paypage',
     name: 'paypage',
     component: PayPage
@@ -101,19 +122,18 @@ const routes = [
     name: 'CenterPage',
     component: CenterPage
   },
-<<<<<<< HEAD
+
   {
     path: '/repairpage',
     name: 'CenterPageGoBack',
     component: CenterPageGoBack
   },
-=======
->>>>>>> 47f5e6460ec9df49bc9d7b6f7182896a49838c8e
+
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+  history: createWebHashHistory(),
+  routes,
 })
 
 export default router

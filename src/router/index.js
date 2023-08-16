@@ -73,9 +73,14 @@ const routes = [
         name: 'PersonalSettings',
         component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/PersonalSettings/PersonalSettings.vue')
       },
+
     ]
   },
-
+  {//账户设置
+    path: '/mail',
+    name: 'mail',
+    component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/mail.vue')
+  },
   {//查看商品详情
     path: '/DetailsPage/:productId',
     name: 'DetailsPage',

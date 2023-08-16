@@ -19,8 +19,9 @@
         </el-col>
         <!--右部菜单部分-->
         <div class="flex-grow" />
-        <el-menu-item index="1" @click="toevaluatepage">维修与回收</el-menu-item>
-        <el-menu-item index="2" @click="tomainhome">
+        <el-menu-item index="1" @click="tomail">邮箱</el-menu-item>
+        <el-menu-item index="2" @click="toevaluatepage">维修与回收</el-menu-item>
+        <el-menu-item index="3" @click="tomainhome">
             <template #title>个人主页</template>
         </el-menu-item>
     </el-menu>
@@ -51,6 +52,9 @@ export default {
         },
         handleSelect(key, keyPath) {
             console.log(key, keyPath)
+        },
+        tomail(){
+            this.$router.push('/mail')
         },
         tomain() {
             this.$router.push('/mainpage')

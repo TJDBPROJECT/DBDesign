@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import mainpage from '../views/mainpage.vue'
 import loginMain from '../views/login_register/loginMain'
-
+import search from '../views/search.vue'
 
 import RepairPage from '../views/DetailePage/repairpage.vue'
 
@@ -16,12 +16,17 @@ const routes = [
   {
     path: '/',
     name: 'loginMain',
-    component:loginMain
+    component: loginMain
   },
   {
     path: '/mainpage',
     name: 'mainpage',
     component: mainpage
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: search
   },
   {
     path: '/evaluatepage',
@@ -45,18 +50,39 @@ const routes = [
       {//我的订单
         path: '/OrderCenter',
         name: 'OrderCenter',
-        component: () => import(/*webpackChunkName:'OOrderCenter'*/ '../views/home/OrderCenter/OrderCenter.vue')
+        children: [
+          {//回收订单
+            path: '/RecycleCenter',
+            name: 'RecycleCenter',
+            component: () => import(/*webpackChunkName:'RecycleCenter'*/ '../views/home/OrderCenter/RecycleCenter.vue')
+          },
+          {//维修订单
+            path: '/RepairCenter',
+            name: 'RepairCenter',
+            component: () => import(/*webpackChunkName:'RepairCenter'*/ '../views/home/OrderCenter/RepairCenter.vue')
+          },
+        ]
       },
       {//我的邮寄地址
         path: '/MyAddress',
         name: 'MyAddress',
         component: () => import(/*webpackChunkName:'MyAddress'*/ '../views/home/MailAddress/MyAddress.vue')
-      }
+      },
+      {//账户设置
+        path: '/PersonalSettings',
+        name: 'PersonalSettings',
+        component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/PersonalSettings/PersonalSettings.vue')
+      },
+      {//账户设置
+        path: '/PersonalSettings',
+        name: 'PersonalSettings',
+        component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/PersonalSettings/PersonalSettings.vue')
+      },
     ]
   },
 
-   {//查看商品详情
-    path: '/DetailsPage',
+  {//查看商品详情
+    path: '/DetailsPage/:productId',
     name: 'DetailsPage',
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/DetailsPage.vue')
   },
@@ -67,17 +93,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
 
   },
-  // {
-
-  //   path: '/RecoveryPage',
-  //   name: 'RecoveryPage',
-  //   component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
-  // },
-
 
 
   {
-    path: '/repairpage',
+    path: '/repairpage/:productId',
     name: 'repairpage',
     component: RepairPage
   },
@@ -113,9 +132,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
-  mode:'hash'
 })
 
 export default router
