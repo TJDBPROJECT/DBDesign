@@ -3,7 +3,7 @@
       <div>订单列表</div>
     </div>
     <div class="OrderDetails">
-      <el-table :data="res" style="width: 100%">
+      <el-table :data="RecycleOrderInfo" style="width: 100%">
         <el-table-column font-size="20px" prop="OrderID" label="订单ID" width="100" />
         <el-table-column prop="CategoryName" label="订单名称" width="200" />
         <el-table-column prop="Type_Name" label="类型" width="150" />
@@ -67,34 +67,47 @@
       ...mapState(['userid']),
     },
     data() {
-      return {
-        res: [], // 存储订单数据
-        editDialogVisible: false, // 修改弹窗可见性
-        editForm: {}, // 修改表单数据
-        editFormRules: { // 修改表单验证规则
-          ExpectedPrice: [{ required: true, message: '请输入预期价格', trigger: 'blur' }],
-          Recycle_Location: [{ required: true, message: '请输入回收地点', trigger: 'blur' }],
-          Recycle_Time: [{ required: true, message: '请选择回收时间', trigger: 'change' }],
-        },
-        deleteDialogVisible: false, // 删除弹窗可见性
-        selectedOrder: null, // 选中的订单数据
-      };
-    },
-    created() {
-      this.fetchOrderData();
-    },
-    methods: {
-      // 获取订单数据
-      fetchOrderData() {
-        getRecycleOrderInfo({ UserID: this.userid })
-          .then((res) => {
-            this.res = res.data;
-          })
-          .catch((error) => {
-            console.error('获取订单信息失败:', error);
-          });
+    return {
+      RecycleOrderInfo: {
+        CategoryID: "",
+        CategoryName: "",
+        TypeID: "",
+        Type_Name: "",
+        Structure_Url: ""
+      }, // 存储订单数据
+      editDialogVisible: false, // 修改弹窗可见性
+      editForm: {}, // 修改表单数据
+      editFormRules: {
+        ExpectedPrice: [{ required: true, message: '请输入预期价格', trigger: 'blur' }],
+        Recycle_Location: [{ required: true, message: '请输入回收地点', trigger: 'blur' }],
+        Recycle_Time: [{ required: true, message: '请选择回收时间', trigger: 'change' }],
       },
-  
+      deleteDialogVisible: false, // 删除弹窗可见性
+      selectedOrder: null, // 选中的订单数据
+    };
+  },
+  created() {
+    console.log("尝试获取回收订单信息")
+    this.fetchRecycleOrderData();
+  },
+      methods: {
+      fetchRecycleOrderData() {
+      getRecycleOrderInfo(this.userid)
+        .then((res) => {
+          const orderData = res.data; // 根据实际返回数据结构获取数据
+          if (orderData && orderData.length > 0) {
+            const firstOrder = orderData[0];
+            this.RecycleOrderInfo.CategoryID = firstOrder.Device.Device_Cate_ID.CategoryID;
+            this.RecycleOrderInfo.CategoryName = firstOrder.Device.Device_Cate_ID.CategoryName;
+            this.RecycleOrderInfo.TypeID = firstOrder.Device.Device_Type_ID.TypeID;
+            this.RecycleOrderInfo.Type_Name = firstOrder.Device.Device_Type_ID.Type_Name;
+            this.RecycleOrderInfo.Structure_Url = firstOrder.Device.Device_Type_ID.Structure_Url;
+          }
+        })
+        .catch((error) => {
+          console.error('获取回收订单信息失败:', error);
+        });
+    },
       // 打开修改弹窗
       openEditDialog(row) {
         this.editForm = { ...row };
@@ -124,7 +137,7 @@
                   title: '成功',
                   message: '修改订单信息成功',
                 });
-                this.fetchOrderData(); // 刷新订单数据
+                this.fetchRecycleOrderData(); // 刷新订单数据
                 this.editDialogVisible = false;
               })
               .catch((error) => {
@@ -154,7 +167,7 @@
       deleteOrder() {
         this.handleDeleteDialogClose();
         ElMessageBox.alert('删除成功', '提示', { type: 'success' });
-        this.fetchOrderData(); // 刷新订单数据
+        this.fetchRecycleOrderData(); // 刷新订单数据
       },
   
       // 分页回调

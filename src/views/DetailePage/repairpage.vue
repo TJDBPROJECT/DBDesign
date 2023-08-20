@@ -271,12 +271,12 @@ export default {
         
         if (createResponse.data.success) {
           console.log('维修订单创建成功:', createResponse.data);
-
+          
           // 获取创建的维修订单信息
           const getOrderResponse = await repair_info({ uid: this.userId }); // 根据需要传入用户ID
 
           console.log('获取维修订单信息:', getOrderResponse.data);
-          
+          this.$router.push({ name: 'pricepage' });
           // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
           // this.$router.push({ name: 'orderDetails', params: { orderId: getOrderResponse.data.orders.OrderID } });
         } else {

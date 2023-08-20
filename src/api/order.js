@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getRecycleOrderInfo(params) {
+export function getRecycleOrderInfo(UserID) {
   return request({
-    url: `http://110.42.220.245:8081/RecycleOrder/${params.UserID}`,
+    url: "/RecycleOrder/"+ UserID,
     method: 'get',
     headers: {
       'Content-Type': 'application/json'
@@ -23,9 +23,9 @@ export function editRecycleOrderInfo(params) {
   });
 }
 
-export function getRepairOrderInfo(params) {
+export function getRepairOrderInfo(UserID) {
   return request({
-    url: `http://110.42.220.245:8081/RepairOrder/${params.UserID}`,
+    url: "/RecycleOrder/"+ UserID,
     method: 'get',
     headers: {
       'Content-Type': 'application/json'

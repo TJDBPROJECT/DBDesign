@@ -1,83 +1,58 @@
 <template>
     <div class="PageTop">
-        <el-row :gutter="50">
-            <el-col :span="40">
-                <el-avatar class="centered-avatar" :src="avatarUrl" />
-            </el-col>
-            <el-col :span="30">
-                <el-row>
-                    <span style="text-shadow: 0px 0px 15px #0752ff, 0px 0px 15px #0752ff;font-size: 40px;">
-                        {{ username }}
-                    </span>
-                </el-row>
-                <el-row class="my-row">
-                    <span style="font-size: 20px;">个性签名</span>
-                </el-row>
-                <el-row class="my-row" v-if="isshowSignature">
-                    <span style="font-size: 15px;">{{ signature }}</span>
-                </el-row>
-                <el-row class="my-row" v-else>
-                    <el-row>
-                        <el-input v-model="signature" placeholder="请输入个性签名"></el-input>
-                    </el-row>
-                    <el-row>
-                        <el-button type="primary" @click="saveSignature">保存</el-button>
-                        <el-button type="default" @click="cancelSignature">取消</el-button>
-                    </el-row>
-
-                </el-row>
-            </el-col>
-            <el-col :span="10" class="button-col">
-                <el-button class="edit-avatar-button" type="primary" @click="showAvatarDialog">更换头像</el-button>
-                <el-button class="edit-signature-button" type="primary"
-                    @click="showSignatureDialog = true">编辑个性签名</el-button>
-            </el-col>
-        </el-row>
+      <el-row :gutter="50">
+        <el-col :span="8">
+          <el-avatar class="centered-avatar" :src="avatarUrl" />
+        </el-col>
+        <el-col :span="16">
+          <el-row class="my-row">
+            <span class="username">{{ username }}</span>
+          </el-row>
+          <el-row class="my-row">
+            <span class="info">{{ userInfo.username }}</span>
+          </el-row>
+        </el-col>
+      </el-row>
     </div>
-
+  
     <div class="MyPage">
-        <el-collapse v-model="activeNames" @change="handleChange">
-            <p></p>
-            <el-collapse-item title="消费信息" name="1">
+      <el-collapse v-model="activeNames" @change="handleChange">
+        <!-- 消费信息折叠项 -->
+        <el-collapse-item title="消费信息" name="1">
+          <template #title>
+            <span class="collapse-title">消费信息</span>
+          </template>
+          <!-- 累计订单数量、已完成数量、累计消费、钱包余额统计 -->
+          <el-row class="statistic-row">
+            <el-col :span="6">
+              <el-statistic title="累计订单数量" :value="55" />
+            </el-col>
+            <el-col :span="6">
+              <el-statistic :value="53">
                 <template #title>
-                    <span style="font-size:20px">消费信息</span>
+                  <div class="title-wrapper">
+                    <span class="title-text">已完成数量</span>
+                  </div>
                 </template>
-                <el-row>
-                    <el-col :span="6">
-                        <el-statistic title="累计订单数量" :value="55" />
-                    </el-col>
-                    <el-col :span="6">
-                        <el-statistic :value="53">
-                            <template #title>
-                                <div class="title-wrapper">
-                                    <span class="title-text">已完成数量</span>
-                                </div>
-                            </template>
-                            <template #suffix>/55</template>
-                        </el-statistic>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-statistic title="累计消费" :value="1720" />
-                    </el-col>
-                    <el-col :span="6">
-                        <el-statistic title="钱包余额" :value="562">
-                            <template #suffix>
-                            </template>
-                        </el-statistic>
-                    </el-col>
-                </el-row>
-            </el-collapse-item>
-            <p></p>
-            <el-collapse-item title="个人信息" name="2">
-                <template #title>
-                    <span style="font-size:20px">个人信息</span>
-                </template>
-                <el-descriptions class="margin-top" title="个人信息表" :column="3" :size="large" border>
-                    <template #extra>
-                        <el-button type="primary" v-if="!editMode" @click="editMode = true">编辑</el-button>
-                        <el-button type="success" v-if="editMode" @click="saveChanges">保存</el-button>
-                        <el-button type="danger" v-if="editMode" @click="cancelEditMode">取消</el-button>
-                    </template>
+                <template #suffix>/55</template>
+              </el-statistic>
+            </el-col>
+            <el-col :span="6">
+              <el-statistic title="累计消费" :value="1720" />
+            </el-col>
+            <el-col :span="6">
+              <el-statistic title="钱包余额" :value="562" />
+            </el-col>
+          </el-row>
+        </el-collapse-item>
+  
+        <!-- 个人信息折叠项 -->
+        <el-collapse-item title="个人信息" name="2">
+          <template #title>
+            <span class="collapse-title">个人信息</span>
+          </template>
+          <!-- 个人信息表 -->
+          <el-descriptions class="info-descriptions" title="个人信息表" :column="3" border>
                     <!-- 用户ID不可修改 -->
                     <el-descriptions-item>
                         <template #label>
@@ -228,7 +203,6 @@ export default {
             editMode: false,
             editSignature: false,
             avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-            signature: "暂未设置个性签名！",
             userInfo: {// 用户信息...
                 id: "",
                 username: "",
@@ -264,33 +238,6 @@ export default {
         }
       })
   },
-    methods: {
-        saveChanges() {
-            // 将编辑后的数据保存到 editedUserInfo 对象中
-            this.editedUserInfo = { ...this.userInfo };
-
-            // 在这里可以将 editedUserInfo 保存在客户端本地，例如使用 localStorage
-            localStorage.setItem('editedUserInfo', JSON.stringify(this.editedUserInfo));
-
-            // 保存成功后，退出编辑模式
-            this.editMode = false;
-        },
-        cancelEditMode() {
-            // 取消编辑模式
-            this.editMode = false;
-        },
-        showAvatarDialog() {
-            // 在这里显示一个对话框或者表单，让用户输入新的头像信息
-            // 处理用户输入后，更新 avatarUrl
-        },
-        showSignatureDialog() {
-            // 在这里显示一个对话框或者表单，让用户输入新的个性签名信息
-            // 处理用户输入后，更新 signature
-            this.isshowSignature = !this.isshowSignature;
-        },
-
-    },
-
     components: {
         Iphone,
         Location,
@@ -328,7 +275,7 @@ export default {
 }
 
 .my-row {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .centered-avatar {

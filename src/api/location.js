@@ -1,9 +1,9 @@
 import request from '@/utils/request'
 
 //获取地址信息
-export function getLocationInfo(params) {
+export function getLocationInfo(UserID) {
   return request({
-    url: `http://110.42.220.245:8081/ServiceLoc/${params.UserID}`,
+    url: "/ServiceLoc/"+ UserID,
     method: 'get',
     headers: {
       'Content-Type': 'application/json'
