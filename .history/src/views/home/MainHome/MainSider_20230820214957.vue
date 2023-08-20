@@ -84,7 +84,7 @@ export default {
         {
           id: '2-2',
           title: '维修订单',
-          router: 'RepairCenter',
+          router: 'OrderCenter',
         }]
       },
       {

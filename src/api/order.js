@@ -1,50 +1,31 @@
-import request from '@/utils/request'
+import request from '@/utils/request';
 
-export function getRecycleOrderInfo(UserID) {
+export function getRecycleOrderInfo(id) {
   return request({
-    url: "/RecycleOrder/"+ UserID,
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    url: `http://110.42.220.245:8081/RecycleOrder/${id}`,
+    method: 'get'
   });
 }
 
-
-export function editRecycleOrderInfo(params) {
+export function editRecycleOrderInfo(id, orderid, data) {
   return request({
-    url: `/RecycleOrder/${params.id}/${params.orderid}`,
+    url: `http://110.42.220.245:8081/RecycleOrder/${id}/${orderid}`,
     method: 'post',
-    data: {
-      ExpectedPrice: params.ExpectedPrice,
-      Recycle_Location: params.Recycle_Location,
-      Recycle_Time: params.Recycle_Time
-    }
+    data
   });
 }
 
-export function getRepairOrderInfo(UserID) {
+export function getRepairOrderInfo(uid) {
   return request({
-    url: "/RecycleOrder/"+ UserID,
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    url: `http://110.42.220.245:8081/RepairOrder/${uid}`,
+    method: 'get'
   });
 }
 
-
-export function editRepairOrderInfo(params) {
+export function editRepairOrderInfo(uid, id, data) {
   return request({
-    url: `/RepairOrder/${params.uid}/${params.id}`,
+    url: `http://110.42.220.245:8081/RepairOrder/${uid}/${id}`,
     method: 'post',
-    data: {
-      CouponID: params.CouponID,
-      EngineerID: params.EngineerID,
-      OptionID: params.OptionID,
-      RepairLocation: params.RepairLocation,
-      RepairTime: params.RepairTime,
-      OrderStatus: params.OrderStatus
-    }
+    data
   });
 }

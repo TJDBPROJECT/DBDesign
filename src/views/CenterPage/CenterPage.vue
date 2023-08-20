@@ -5,16 +5,35 @@
       <div class="container">
         <el-scrollbar class="scrollbar" :height="containerHeight">
           <div class="scrollbar-container">
-            <el-card v-for="center in data" :key="center.id" class="card-item">
+            <el-card v-for="center in data" :key="center.id" class="card-item"     >
               <div class="card-content">
                 <div class="card-left">
+
+
+                  <!-- <img
+                    :src="center.TIMG_URL"
+                    :class="{ 'card-image': true, 'dimmed-image': center.hovered }"
+                    @mouseenter="handleImageHover(center)"
+                    @mouseleave="handleImageHover(center)"
+                    @click="navigateToExamplePage(center.ID)"
+                  /> -->
+
                   <img
+                    :src="center.TIMG_URL"
+                    :class="{ 'card-image': true, 'dimmed-image': center.hovered }"
+                    @mouseenter="center.hovered = true"
+                    @mouseleave="center.hovered = false"
+                    @click="navigateToExamplePage(center.ID)"
+                  />
+
+
+                  <!-- <img
                     :src="center.TIMG_URL"
                     class="card-image"
                     @mouseover="hoverImage(center.id, true)"
                     @mouseleave="hoverImage(center.id, false)"
-                  />
-                  <el-button class="card-button" type="primary">详情</el-button>
+                  /> -->
+                  <el-button class="card-button" type="primary" @click="navigateToExamplePage(center.ID)">详情</el-button>
                 </div>
                 <div class="card-right">
                   <el-descriptions title="Centers Details" :column="1" border>
@@ -59,8 +78,8 @@ export default {
     mapLocations() {
       return this.data.map((center) => ({
         name: center.Loc_Detail,
-        lng: center.Longitude,//this.getGeolocation(center.Loc_Detail).lng,
-        lat: center.Latitude,//this.getGeolocation(center.Loc_Detail).lat,
+        lng: center.Longitude,
+        lat: center.Latitude,
       }));
     },
 
@@ -79,57 +98,57 @@ export default {
     this.fetchServiceCenterData(); // Fetch service center data from the server
   },
   methods: {
+
+    // handleImageHover(center) {
+    //   center.hovered = !center.hovered; // 切换悬停状态
+
+    //   if (center.hovered) {
+    //     // 鼠标悬停时，在地图上标记相应的地点
+    //     this.$refs.map.addMarker(center);
+    //   } else {
+    //     // 鼠标离开时，从地图上移除标记
+    //     this.$refs.map.removeMarker(center);
+    //   }
+    // },
+
     CenterPageGoBack() {
       this.$router.push({ name: 'repairpage' });
     },
 
-
+    
+    // navigateToExamplePage(centerId) {
+    //   // 根据传递的centerId进行页面导航
+    //   this.$router.push({ name: 'ExamplePage', params: { centerId } });
+    // },
+    
+    navigateToExamplePage(centerId, centerData) {
+      this.$router.push({ name: 'ExamplePage', params: { centerId }, state: { centerData } });
+    },
 
     // async fetchServiceCenterData() {
     //   try {
     //     const response = await getAllServiceCenters();
-    //     console.log('Fetched data:', response.data); // 输出获取到的数据
     //     this.data = response.data.ServiceCenter;
+    //     this.dataLoaded = true; // Set the flag to true after data is loaded
     //   } catch (error) {
     //     console.error('Error fetching service center data:', error);
     //   }
-    // }
-    // async fetchServiceCenterData() {
-    //   try {
-    //     const response = await getAllServiceCenters();
-    //     this.data = response.data.ServiceCenter;
-    //   } catch (error) {
-    //     console.error('Error fetching service center data:', error);
-    //   }
-    // },
-    // async fetchServiceCenterData() {
-    //   try {
-    //     const response = await getAllServiceCenters(); // 调用 API 获取服务中心数据
-    //     this.data = response.data.ServiceCenter; // 将获取的数据赋值给 this.data
-    //   } catch (error) {
-    //     console.error('Error fetching service center data:', error);
-    //   }
-    // },
+    // },//8.14版本
 
     async fetchServiceCenterData() {
       try {
         const response = await getAllServiceCenters();
-        this.data = response.data.ServiceCenter;
+        this.data = response.data.ServiceCenter.map(center => ({
+          ...center,
+          hovered: false,
+        }));
         this.dataLoaded = true; // Set the flag to true after data is loaded
       } catch (error) {
         console.error('Error fetching service center data:', error);
       }
-    },
-
-    hoverImage(id, isHover) {
-      const cardImage = document.getElementById(`card-image-${id}`);
-      if (cardImage) {
-        cardImage.style.filter = isHover ? 'brightness(70%)' : 'none';
-      }
-    },
+    },//8.18版本
 
 
-    // Rest of the methods remain the same
   },
 };
 
@@ -253,4 +272,10 @@ export default {
   width: 100px;
   height: 40px;
 }
+
+
+.dimmed-image {
+  filter: brightness(0.5); /* 降低亮度的样式 */
+}
+
 </style>

@@ -3,7 +3,7 @@
       <div>订单列表</div>
     </div>
     <div class="OrderDetails">
-      <el-table :data="RepairOrderInfo" style="width: 100%">
+      <el-table :data="orders" style="width: 100%">
         <el-table-column prop="OrderID" label="订单ID" width="100" />
         <el-table-column prop="OrderPrice" label="订单金额" width="100" />
         <el-table-column prop="EngineerID" label="工程师ID" width="100" />
@@ -75,36 +75,7 @@
     },
     data() {
       return {
-        RepairOrderInfo: {
-        OrderID: "",
-        OrderPrice: 0,
-        CouponID: "",
-        CouObj: {
-          Id: "",
-          Name: "",
-          Type: 0,
-          Discount: 0,
-          Status: false
-        },
-        EngineerID: "",
-        UserID: "",
-        RepairOptionID: {
-          OptionID: "",
-          RepairRequirement: "",
-          RepairCategoryID: "",
-          CateId: "",
-          CateName: "",
-          CateImage: "",
-          CateDetail: "",
-          Brand: "",
-          RepairPrice: 0
-        },
-        CreateTime: "",
-        RepairLocation: "",
-        RepairTime: "",
-        UserRate: "",
-        OrderStatus: 0
-      },
+        orders: [],
         editDialogVisible: false, // 修改弹窗可见性
         editForm: {}, // 修改表单数据
         editFormRules: {
@@ -127,6 +98,7 @@
       fetchOrderData() {
         getRepairOrderInfo({ UserID: this.userid })
           .then((res) => {
+            console.log('获取回收订单信息成功:',res.data);
             this.res = res.data.orders;
           })
           .catch((error) => {

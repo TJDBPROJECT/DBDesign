@@ -3,7 +3,7 @@
       <div>订单列表</div>
     </div>
     <div class="OrderDetails">
-      <el-table :data="orderData" style="width: 100%">
+      <el-table :data="RecycleOrderInfo" style="width: 100%">
         <el-table-column font-size="20px" prop="OrderID" label="订单ID" width="100" />
         <el-table-column prop="CategoryName" label="订单名称" width="200" />
         <el-table-column prop="Type_Name" label="类型" width="150" />
@@ -68,7 +68,13 @@
     },
     data() {
     return {
-      orderData: [], // 存储订单数据
+      RecycleOrderInfo: {
+        CategoryID: "",
+        CategoryName: "",
+        TypeID: "",
+        Type_Name: "",
+        Structure_Url: ""
+      }, // 存储订单数据
       editDialogVisible: false, // 修改弹窗可见性
       editForm: {}, // 修改表单数据
       editFormRules: {
@@ -88,8 +94,15 @@
       fetchRecycleOrderData() {
       getRecycleOrderInfo(this.userid)
         .then((res) => {
-          console.log('获取回收订单信息成功:',res.data);
-          this.res = res.data.orderData; // 根据实际返回数据结构获取数据
+          const orderData = res.data; // 根据实际返回数据结构获取数据
+          if (orderData && orderData.length > 0) {
+            const firstOrder = orderData[0];
+            this.RecycleOrderInfo.CategoryID = firstOrder.Device.Device_Cate_ID.CategoryID;
+            this.RecycleOrderInfo.CategoryName = firstOrder.Device.Device_Cate_ID.CategoryName;
+            this.RecycleOrderInfo.TypeID = firstOrder.Device.Device_Type_ID.TypeID;
+            this.RecycleOrderInfo.Type_Name = firstOrder.Device.Device_Type_ID.Type_Name;
+            this.RecycleOrderInfo.Structure_Url = firstOrder.Device.Device_Type_ID.Structure_Url;
+          }
         })
         .catch((error) => {
           console.error('获取回收订单信息失败:', error);
