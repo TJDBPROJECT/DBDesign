@@ -105,7 +105,7 @@ export default {
         id: '5',
         icon: Help,
         title: '充值提现',
-        router: 'money',
+        router: '',
         Subclass: []
       },
       {

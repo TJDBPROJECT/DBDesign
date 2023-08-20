@@ -76,7 +76,7 @@ const routes = [
       {//账户设置
         path: '/money',
         name: 'money',
-        component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/money.vue')
+        component: () => import(/*webpackChunkName:'PersonalSettings'*/ '../views/home/PersonalSettings/PersonalSettings.vue')
       },
     ]
   },

@@ -222,35 +222,6 @@ export default {
         }
 
     },
-    created() {
-        console.log("尝试拿到个人信息")
-        const UserID = this.userid; 
-        getUserProfile(UserID)
-            .then((res) => {
-                // 处理返回的用户个人资料数据
-                console.log("拿数据成功");
-                console.log(UserID);
-                console.log('Response Data:', res.data); // 打印获取到的数据
-                this.userInfo = res.data; // 将获取到的数据存储到userInfo中
-            })
-            .catch((error) => {
-                // 处理错误
-                console.log("拿数据失败");
-                console.error('Error:', error); // 打印错误信息
-            });
-    },
-//     mounted() {
-//     getUserProfile(this.userid).then((res) => {
-//       console.log(this.userid);
-//       if (res.data === false) {
-//         this.$message.error("获得失败");
-//       } else {
-//         this.$message.success("获得成功");
-//         console.log("获得成功");
-//         console.log(res.data);
-//       }
-//     });
-//   },
     data() {
         return {
             isshowSignature: true,
@@ -265,13 +236,34 @@ export default {
                 name: "",
                 telephone: "",
                 email: "",
-                identity: "",
+                identity: ""
             },
             editedUserInfo: {
 
             }, // 用于保存编辑后的数据
         };
     },
+    created(){
+    console.log("尝试拿到个人信息")
+      //请求地址,this和vm指的是全局
+      getUserProfile(this.userid).then((res) => {
+        console.log(res.data)
+        if (res.data === false) {
+          console.log("拿数据失败")
+        }
+        else {
+          console.log("拿数据成功")
+          console.log(res.data[0])
+          this.userInfo.id= this.userid
+          this.userInfo.name = res.data[0].name
+          this.userInfo.username= res.data[0].userName
+          this.userInfo.userlevel= res.data[0].level
+          this.userInfo.telephone= res.data[0].telephone
+          this.userInfo.email=res.data[0].email
+          this.userInfo.identity= res.data[0].identity
+        }
+      })
+  },
     methods: {
         saveChanges() {
             // 将编辑后的数据保存到 editedUserInfo 对象中
