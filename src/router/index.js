@@ -12,6 +12,8 @@ import CenterPage from '../views/CenterPage/CenterPage.vue'
 import CenterPageGoBack from '../views/CenterPage/CenterPage.vue'
 import navigateToExamplePage from '../views/CenterPage/ExamplePage.vue'; // 替换为实际的ExamplePage组件路径
 
+
+
 const routes = [
   {
     path: '/',
@@ -92,7 +94,7 @@ const routes = [
   },
   {//进入回收页
 
-    path: '/recoverypage',
+    path: '/recoverypage/:productId',
     name: 'recoverypage',
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
 
@@ -105,7 +107,7 @@ const routes = [
     component: RepairPage
   },
   {
-    path: '/pricepage',
+    path: '/pricepage/:productId',
     name: 'pricepage',
     component: PricePage
   },
@@ -122,16 +124,17 @@ const routes = [
     component: PayPage
   },
   {
-    path: '/CenterPage',
+    path: '/CenterPage/:productId',
     name: 'CenterPage',
     component: CenterPage
   },
 
   {
-    path: '/repairpage',
+    path: '/repairpage/:productId',
     name: 'CenterPageGoBack',
     component: CenterPageGoBack
   },
+
   {
     path: '/CenterPage/:centerId', // 注意：这里使用动态路由参数
     name: 'ExamplePage',

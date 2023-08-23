@@ -1,19 +1,17 @@
 <template>
   <div>
-    <!--最上方的步骤记录条-->
+    <!-- 最上方的步骤记录条 -->
 
     <el-header style="margin-top: 20px;">
-        <el-steps :active="3" align-center>
-    <el-step title="Step 1" description="Some description" />
-    <el-step title="Step 2" description="Some description" />
-    <el-step title="Step 3" description="Some description" />
-    <el-step title="Step 4" description="Some description" />
-  </el-steps>
+      <el-steps :active="3" align-center>
+        <el-step title="Step 1" description="Some description" />
+        <el-step title="Step 2" description="Some description" />
+        <el-step title="Step 3" description="Some description" />
+        <el-step title="Step 4" description="Some description" />
+      </el-steps>
     </el-header>
 
-   
-
-    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
       <el-table-column type="selection" width="55" />
       <el-table-column label="图片信息" width="180">
         <template #default="{ row }">
@@ -21,151 +19,177 @@
         </template>
       </el-table-column>
       <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
+      
       <el-table-column property="下单时间" label="下单时间" width="180"></el-table-column>
       <el-table-column property="下单用户名" label="下单用户名" width="120"></el-table-column>
       <el-table-column property="物品名称" label="物品名称" width="120"></el-table-column>
       <el-table-column property="约定的服务地点" label="约定的服务地点" width="300"></el-table-column>
       <el-table-column property="订单金额" label="订单金额" width="150"></el-table-column>
       <el-table-column property="订单状态" label="订单状态" width="100"></el-table-column>
+
+     
     </el-table>
 
-    <div class="spacer"></div> 
+    <div class="spacer"></div>
 
-    <div class="spacer"></div> 
+    <div class="spacer"></div>
     <el-row>
-  <el-col :span="8">
-    <el-countdown title="自动关闭界面剩余时间" :value="value" style="font-size: 20px;" />
-  </el-col>
-  <el-col :span="8">
-    <el-countdown
-      title="支付剩余时间"
-      format="HH:mm:ss"
-      :value="value1"
-    />
-  </el-col>
-</el-row>
-
+      <el-col :span="8">
+        <el-countdown title="自动关闭界面剩余时间" :value="value" style="font-size: 20px;" />
+      </el-col>
+      <el-col :span="8">
+        <el-countdown title="支付剩余时间" format="HH:mm:ss" :value="value1" />
+      </el-col>
+    </el-row>
   </div>
 
   <div class="total-amount">
-      <span class="amount-label">总金额：</span>
-      <span class="amount-value">{{ totalAmount }}元</span>
-      <el-button type="primary" @click="goback">返回</el-button>
-      <el-button type="primary" @click="handleAppointment">支付</el-button>
-    </div>
-
+    <span class="amount-label">总金额：</span>
+    <span class="amount-value">{{ this.price }}元</span>
+    <el-button type="primary" @click="rechargeBalance">充钱</el-button>
+    <el-button type="primary" @click="goback">返回</el-button>
+    <el-button type="primary" @click="submitForm">支付</el-button>
+  </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import { ElTable, ElCountdown } from 'element-plus';
-import logoImage from '@/assets/logo.png';
+import { ref} from 'vue';
+import { ElTable, ElSteps, ElCountdown } from 'element-plus';
+import { createRepairOrder, repair_info } from "@/api/repairprice_info.js";
+import axios from 'axios';
 import dayjs from 'dayjs';
-import { repair_info } from '@/api/repairprice_info';
 
 export default {
   name: 'PricePage',
   components: {
     ElTable,
+    ElSteps,
     ElCountdown,
-    
   },
-  setup() {
-    const multipleTableRef = ref(null)
-    const multipleSelection = ref([])
-    const tableData = ref([]); // Use ref to store table data
-
-    const toggleSelection = (rows) => {
-      if (rows) {
-        rows.forEach((row) => {
-          multipleTableRef.value.toggleRowSelection(row, undefined)
-        })
-      } else {
-        multipleTableRef.value.clearSelection()
-      }
-    }
-
-    onMounted(async () => {
-      //在组件挂载后读取数据
-      try {
-        const response = await repair_info();
-        if (response.data === false) {
-          console.error('获取数据失败');
-          return;
-        }
-        const rawData = response.data; // Assuming rawData is an array received from the API
-        tableData.value = rawData.map((item) =>({
-          imageUrl: logoImage,
-          '服务类型（维修/回收）': item.type_name,
-          下单时间: item.repairtime,
-          下单用户名: item.username,
-          物品名称: item.product_name,
-          约定的服务地点: item.repairlocation,
-          订单金额: `${item.order_amount}元`,
-          订单状态: item.order_status,
-        }));
-      } catch (error) {
-        console.error('获取数据失败:', error);
-      }
-    });
-    const handleSelectionChange = (val) => {
-      multipleSelection.value = val
-    }
-
-
-    // 计算总金额
-    const totalAmount = computed(() => {
-      return multipleSelection.value.reduce((sum, item) => {
-        const price = parseFloat(item['订单金额'])
-        return sum + price
-      }, 0)
-    })
-
-    const value = ref(Date.now() + 1000 * 60 * 60 * 7)
-    const value1 = ref(Date.now() + 1000 * 60 * 60 * 24 * 2)
-    const value2 = ref(dayjs().add(1, 'month').startOf('month'))
-
-    function reset() {
-      value1.value = Date.now() + 1000 * 60 * 60 * 24 * 2
-    }
-
+  data() {
     return {
-      multipleTableRef,
-      multipleSelection,
-      tableData,
-      totalAmount,
-      toggleSelection,
-      handleSelectionChange,
-      value,
-      value1,
-      value2,
-      reset,
+      multipleTableRef: ref(null),
+      tableData: ref([]),
+      value: Date.now() + 1000 * 60 * 60 * 7,
+      value1: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      value2: dayjs().add(1, 'month').startOf('month'),
+    };
+  },
+  created() {
+    const passedData = this.$route.query.data;
+    console.log("接受的数据", passedData);
+    if (passedData) {
+      const parsedData = JSON.parse(passedData);
+      this.form = parsedData.form;
+      this.price= parsedData.price;
+      this.uploadedImages = parsedData.uploadedImages;
+      this.productId=parsedData.productId;
+      //const imageUrl = 'https://example.com/path/to/your/image.jpg';/*订单中所展示出来的图片*/ 
+      // 添加传递的信息到表格数据中
+      this.tableData.push({
+        form: parsedData.form,
+        //imageUrl: imageUrl, 
+        '服务类型（维修/回收）': '维修',
+        下单用户名: parsedData.form.name,
+        物品名称:parsedData.form.deviceName,
+        约定的服务地点:parsedData.form.location,
+        下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'), 
+        订单金额: '100元', 
+        订单状态: '待支付', 
+      });
     }
   },
   methods: {
-    getDataFromServer() {
-      repair_info().then((res) => {
-        this.data = res.data; // 假设返回的数据为一个数组，直接将数据赋值给data
-      }).catch((error) => {
-        console.error('获取数据失败:', error);
-      });
-    },
-    mounted() {
-      // 接收上一个组件的值，并将其赋给data.product.productId
-        this.product.productId = this.$route.params.productId;
-        console.log("接收的 productId:", this.$route.params.productId);
-      },
-    handleAppointment() {
-      console.log('点击了')
-      this.$router.push({ name: 'paypage' })
-    },
-
-    goback() {
-    this.$router.push({ name: 'repairpage' });
+    /*为账户充钱的函数*/
+    async rechargeBalance() {
+    try {
+      const uid = 10000; 
+      const num = 500; 
+      const response = await axios.post(`http://110.42.220.245:8081/Balance/Charge/${uid}?num=${num}`);
+      
+      if (response.data.success) {
+        console.log('Recharge successful');
+        // You can update the user's balance in your component's data here
+      } else {
+        console.error('Recharge failed');
+      }
+    } catch (error) {
+      console.error('Error during recharge:', error);
     }
-
   },
-}
+    async submitForm() {
+      try {
+         // 构造要传递给PayPage的数据
+        const dataToPass = {
+          productId:this.productId,
+        };
+        console.log("传递的数据", dataToPass);
+         // 使用query参数传递数据，而不是params
+         this.$router.push({
+          name: 'paypage',
+          query: {
+            data: JSON.stringify(dataToPass),
+            productId:this.productId,
+          },
+         
+        });
+        
+      } catch (error) {
+        console.error('Error navigating to PricePage:', error);
+      }
+      try {
+        const createdata = {
+          CouponID: 'cou123',
+          EngineerID: 'eng001',
+          OptionID: 'opt123',
+          RepairLocation: '同济大学19号楼',
+          RepairTime: '2023-08-21T22:20:00',
+          OrderPrice:200,
+          ProblemPart:"屏幕",
+          ProblemDetail:"屏幕碎裂",
+          Requirement:"换个屏幕",
+          Brand:"华为",
+        };
+
+        const createResponse = await createRepairOrder(createdata);
+        
+        if (createResponse.data.success) {
+          console.log('维修订单创建成功:', createResponse.data);
+          this.$router.push({ name: 'paypage' });
+          const getOrderResponse = await repair_info({ uid: this.userId }); 
+
+          console.log('获取维修订单信息:', getOrderResponse.data);
+
+          // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
+        } else {
+          console.error('维修订单创建失败:', createResponse.data);
+        }
+      } catch (error) {
+        console.error('Error creating order:', error);
+      }
+    },
+    async goback() {
+      try {
+         // 构造要传递给repairpage的数据
+        const dataToPass = {
+          productId:this.productId,
+        };
+        console.log("传递的数据", dataToPass);
+         // 使用query参数传递数据，而不是params
+         this.$router.push({
+          name: 'repairpage',
+          query: {
+            data: JSON.stringify(dataToPass),
+          },
+         
+        });
+        
+      } catch (error) {
+        console.error('Error navigating to repairpage:', error);
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

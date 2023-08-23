@@ -13,7 +13,7 @@ export default {
   methods: {
     goback() {
       console.log("点击了");
-      this.$router.push({ name: 'pricepage' });
+      this.$router.push({ name: 'mainpage' });
     }
   }
 };

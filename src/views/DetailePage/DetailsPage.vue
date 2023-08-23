@@ -117,10 +117,9 @@
           '/public/p.jpg',
         ]
         }, 
-        Product:[],
         previousPage: 'mainpage',
         deviceInfo: null,
-        type_name: 'Apple',
+       
       };
     },
     mounted() {
@@ -159,7 +158,7 @@
       });
       this.updatePreviousPage();
         
-      },
+    },
     watch:{
       activeIndex(newIndex) {
         this.product.currentimageUrl = this.product.imageList[newIndex].url;
@@ -169,7 +168,7 @@
     methods: {
       goToRecyclePage() {
         // 进入回收界面的逻辑
-        this.$router.push('/RecoveryPage');
+        this.$router.push({ name: 'RecoveryPage', params: { productId: this.product.productId } });
       },
       goToRepairPage() {
         // 进入维修界面的逻辑
@@ -219,10 +218,6 @@
           console.error('请求错误:', error);
         });
       },
-     
-    
-    
-    
     }
   };
   </script>

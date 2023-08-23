@@ -134,7 +134,7 @@
     height: 50%;
     position: absolute;
     right: 0;
-    top: 20%;
+    top: 10%;
     transition: 1s ease-in-out;
     transition-delay: 0.5s;
     display: grid;
@@ -170,7 +170,7 @@
   .container.sign-up-model .inner-sign-up-container {
     width: 50%;
     height: 50%;
-    top: 20%;
+    top: 10%;
     right: 50%;
     transition: 1s ease-in-out;
     transition-delay: 0.5s;

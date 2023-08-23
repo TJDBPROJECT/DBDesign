@@ -5,7 +5,7 @@ const id=10000;
 /*创建回收订单信息*/
 export function createRecycleOrder() {
   return request({
-    url: `http://110.42.220.245:8081/RecycleOrder/{id}`,
+    url: `http://110.42.220.245:8081/RecycleOrder/${id}`,
     method: 'post',
     data: {
       Device_Cate:"phone",

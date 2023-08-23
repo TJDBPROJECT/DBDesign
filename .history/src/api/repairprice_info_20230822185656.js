@@ -13,16 +13,11 @@ export function createRepairOrder() {
     url: `http://110.42.220.245:8081/RepairOrder/${uid}`,
     method: 'post',
     data: {
-      CouponID: 'cou123',
-          EngineerID: 'eng001',
-          OptionID: 'opt123',
-          RepairLocation: '同济大学19号楼',
-          RepairTime: '2023-08-21T22:20:00',
-          OrderPrice:200,
-          ProblemPart:"屏幕",
-          ProblemDetail:"屏幕碎裂",
-          Requirement:"换个屏幕",
-          Brand:"华为",
+      CouponID: "cou123",
+      EngineerID:"eng001",
+      OptionID: "opt123",
+      RepairLocation: "TBD",
+      RepairTime: "2023-08-03T15:31:57",
     },
   });
 }

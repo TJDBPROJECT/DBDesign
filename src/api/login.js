@@ -46,8 +46,11 @@ export function register(params) {
     data: {
       Password: params.password,
       UserName: params.user_name,
-      Telephone:params.Telephone,
-      Email: params.email
+      Telephone:params.telephone,
+      Email: params.email,
+      Identity: params.identity,
+      Name: params.name,
+
     }
   })
 }

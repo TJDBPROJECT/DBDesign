@@ -7,8 +7,17 @@
     <ElFormItem prop="password">
       <ElInput placeholder="请输入密码" :prefix-icon="icons.Lock" v-model="registerForm.password" size="large"></ElInput>
     </ElFormItem>
+    <ElFormItem prop="name">
+      <ElInput placeholder="请输入姓名" :prefix-icon="icons.Message" v-model="registerForm.name" size="large"></ElInput>
+    </ElFormItem>
     <ElFormItem prop="email">
       <ElInput placeholder="请输入邮箱" :prefix-icon="icons.Message" v-model="registerForm.email" size="large"></ElInput>
+    </ElFormItem>
+    <ElFormItem prop="identity">
+      <ElInput placeholder="请输入身份证号码" :prefix-icon="icons.Message" v-model="registerForm.identity" size="large"></ElInput>
+    </ElFormItem>
+    <ElFormItem prop="telephone">
+      <ElInput placeholder="请输入电话号码" :prefix-icon="icons.Message" v-model="registerForm.telephone" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" class="register-btn" size="large" @click="zhuce">注册</ElButton> 
@@ -39,14 +48,21 @@ export default {
       dialogVisible:false,
       // 表单信息
       registerForm: {
-        // 账户数据
+        // 用户名
         username: "",
         // 密码数据
         password: "",
         // 邮箱
         email: "",
+        //姓名
+        name: "",
+        //身份证
+        identity: "",
+        //电话号码
+        telephone: "",
         // 验证码数据
         code: "",
+
         // 记住密码
         remember: false,
         // 验证码的key，因为前后端分离，这里验证码不能由后台存入session，所以交给vue状态管理
@@ -54,7 +70,7 @@ export default {
       },
       // 表单验证
       rules: {
-        // 设置账户效验规则
+        // 设置用户名效验规则
         username: [
           { required: true, message: "请输入账户", trigger: "blur" },
           { min: 3, max: 10, message: "长度在 3 到 10 个字符的账户", trigger: "blur" },
@@ -67,6 +83,20 @@ export default {
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
           { min: 6, max: 20, message: "长度在 6 到 20 个字符的邮箱", trigger: "blur" },
+        ],
+        // 设置姓名效验规则
+        name: [
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          { min: 4, max: 15, message: "长度在 4 到 16 个字符的姓名", trigger: "blur" },
+        ],
+        // 设置身份证效验规则
+        identity: [
+          { required: true, message: "请输入身份证", trigger: "blur" },
+          { min: 0, max: 18, message: "长度为18个字符", trigger: "blur" },
+        ],
+        telephone:[
+          { required: true, message: "请输入手机号码", trigger: "blur" },
+          { min: 0, max: 18, message: "", trigger: "blur" },
         ],
         // 设置验证码效验规则
         code: [
@@ -90,15 +120,19 @@ export default {
         user_name: this.registerForm.username,
         password: this.registerForm.password,
         email: this.registerForm.email,
+        identity:this.registerForm.identity,
+        telephone:this.registerForm.telephone,
+        name:this.registerForm.name,
       }
       console.log(params)
+    
       register(params).then((res) => {
+        console.log(res.data)
         if (res.data === false) {
           vm.$message.error("注册失败");
           vm.resetForm();
         }
         else {
-          console.log(res)
           vm.$message.success("注册成功");
           this.UserID=res.data.id;
           this.dialogVisible=true;
@@ -121,7 +155,7 @@ export default {
   opacity: 0;
   transition: 1s ease-in-out;
   /* 上下 | 左右 */
-  padding: 1% 25%;
+  padding: 0% 25%;
   z-index: 0;
 }
 

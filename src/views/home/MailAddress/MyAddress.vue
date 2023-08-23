@@ -4,10 +4,8 @@
     <el-button type="success" @click="editLocation">修改地址信息</el-button>
     <el-button type="danger" @click="deleteLocation">删除地址信息</el-button>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="Location_Name" label="收件人姓名" width="250" />
-        <el-table-column prop="Loc_Detail" label="电话号码" width="250" />
-        <el-table-column prop="Address_Label" label="地址标签" width="250" />
-        <el-table-column prop="address" label="地址" @click="selectLocation"/>
+        <el-table-column prop="Location_Name" label="地址名" width="500" />
+        <el-table-column prop="Loc_Detail" label="详细地址" width="500"  @click="selectLocation"/>
       </el-table>
     </div>
   </template>
@@ -153,6 +151,6 @@
       right: 0;
       padding: 10px 0;
       margin: 0 auto;
-      max-width: 1400px;
+      max-width: 1000px;
   }
   </style>

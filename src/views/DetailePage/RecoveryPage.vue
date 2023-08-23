@@ -12,14 +12,14 @@
     </el-header>
 
   <div class="product-recycle">
-
+    <div class="centered-container">
     <div class="left-panel">
       <img :src="productImage" alt="Device Image" style="height: 400px; width: 400px;"/>
 
       <div class="order-button">
         
         <el-button type="primary" @click="goback" class="order-button">  返回  </el-button>
-        <el-button type="primary" @click="submitForm" class="order-button">  下单  </el-button>
+        <el-button type="primary" @click="goToPricePage" class="order-button">  下单  </el-button>
       </div>
 
     </div>
@@ -27,76 +27,93 @@
 
     <div class="right-panel">
       <!-- 输入设备基本信息，品牌、型号 -->
-        <div class="product-info">
-            <h1 style="display: flex;">{{ productName }}</h1>
-            <h2 style="display: flex;margin-bottom: 10px;">{{ productModel }}</h2>
-            <p class="__services">
-            <el-icon class="gray-icon"><Avatar /></el-icon><span class="gray-text">免费上门</span>
-            <el-icon class="gray-icon"><Shop /></el-icon><span class="gray-text">价格合理</span>
-            <el-icon class="gray-icon"><Management /></el-icon><span class="gray-text">品质服务</span>
-            </p>
-            <hr style="width: 370px;margin-left: 0px;"/>
+      <div class="product-info">
+        <div class="info-title">
+          <h1>{{ deviceInfo && deviceInfo.DeviceType[0].Brand }}</h1>
+          <h2>{{ deviceInfo && deviceInfo.DeviceType[0].Type_Name }}</h2>
         </div>
-        
-        <div class="storage-group" style="margin-top: 0px;">
-            <h3 class="group-title">{{ title }}</h3>
-            <div class="btn-group">
-            <el-button
-                v-for="(option, index) in options"
-                :key="index"
-                :type="selectedOption === option.value ? 'primary' : 'default'"
-                @click="selectOption(option.value)"
-            >{{ option.label }}</el-button>
-            </div>
-        </div>
+        <p class="__services">
+          <el-icon class="gray-icon"><Avatar /></el-icon><span class="gray-text">免费上门</span>
+          <el-icon class="gray-icon"><Shop /></el-icon><span class="gray-text">价格合理</span>
+          <el-icon class="gray-icon"><Management /></el-icon><span class="gray-text">品质服务</span>
+        </p>
+        <hr style="width: 370px; margin-left: 0px;"/>
+      </div>
+
       
-  
+
       <div class="product-form">
-        <el-form ref="productForm" :model="form" label-width="120px">
-          
-        <div style="margin-left: 50px;">
-          <storage-group
-            title="存储容量"
-            :options="['64GB', '128GB', '256GB', '512GB']"
-            @option-selected="handleOptionSelected"
-          ></storage-group>
+        <div class="storage-group" style="margin-top: 0px;">
+          <h3 class="group-title">{{ title }}</h3>
+          <div class="btn-group">
+            <el-button
+              v-for="(option, index) in options"
+              :key="index"
+              :type="selectedOption === option.value ? 'primary' : 'default'"
+              @click="selectOption(option.value)"
+            >{{ option.label }}</el-button>
+          </div>
         </div>
+        <el-form ref="productForm" :model="form" label-width="120px">
+          <el-form-item label="存储容量">
+            <DropdownList :options="['64G', '128G', '256G']" v-model="form.storage_capacity"></DropdownList>
+          </el-form-item>
+
           <el-form-item label="购买渠道">
-            <div>
-              <DropdownList :options="['自营门店', '官方门店', '网络门店']"></DropdownList>
-            </div>
+            <DropdownList :options="['自营门店', '官方门店', '网络门店']" v-model="form.purchase_channel"></DropdownList>
           </el-form-item>
-          <el-form-item label="机身外观">
-            <el-input class="input"  v-model="form.device_cate"></el-input>
+
+          <el-form-item label="设备品牌" label-align="left" align="center">
+              <el-select v-model="form.deviceName">
+                <el-option label="iphone" value="iphone" />
+                <el-option label="华为" value="华为" />
+                <el-option label="小米" value="小米" />
+                <el-option label="三星" value="三星" />
+                <el-option label="oppo" value="oppo" />
+                <el-option label="vivo" value="vivo" />
+                <el-option label="联想" value="联想" />
+                <el-option label="索尼" value="索尼" />
+                <el-option label="戴尔" value="戴尔" />
+                <el-option label="任天堂" value="任天堂" />
+                <!-- 添加其他地点选项 -->
+              </el-select>
+            </el-form-item>
+          
+
+            <el-form-item label="设备型号">
+              <el-input  class="input" v-model="form.device_type"></el-input>
+            </el-form-item>
+
+
+
+          <el-form-item label="回收时间" label-align="center" align="center">
+            <el-date-picker v-model="form.recycle_time" type="datetime" placeholder="选择日期时间"></el-date-picker>
           </el-form-item>
-          <el-form-item label="屏幕显示">
-            <el-input  class="input" v-model="form.device_type"></el-input>
-          </el-form-item>
-          <el-form-item label="屏幕外观">
-            <el-input  class="input" v-model="form.recycle_location"></el-input>
+
+          <el-form-item label="回收地点" label-align="center" align="center">
+            <el-select v-model="form.recycle_location">
+              <el-option label="北京" value="北京" />
+              <el-option label="上海" value="上海" />
+              <el-option label="广东" value="广东" />
+              <!-- 添加其他地点选项 -->
+            </el-select>
           </el-form-item>
           
-    <!-- 其他页面内容 -->
-          <div style="margin-left: 50px;">
-            <RepairHistory title="维修历史"></RepairHistory>
-          </div>  
+            
           
+
         </el-form>
-
-        
-
       </div>
     </div>
+  </div>
   </div>
 </template>
   
   <script>
-  import StorageGroup from '@/components/StorageGroup.vue'
-  import RepairHistory from '@/components/RepairHistory.vue'
+  // import RepairHistory from '@/components/RepairHistory.vue'
   import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
-
-  import { createRecycleOrder } from '@/api/repair_info.js'
+  import axios from 'axios';
   
   export default {
 
@@ -116,172 +133,252 @@
       return {
         productImage: require('/public/p.jpg'),
         productName: '设备名称',
-        productModel: '设备型号',
+        productId: '设备型号',
         form: {
-          device_cate: '类型',
-          device_type: '型号',
-          expectedprice: '价格',
-          recycle_location: '地点',
-          recycle_time: '时间',
+          device_cate: '',
+          device_type: '',
+          deviceName: '',
+          expectedprice: '',
+          recycle_location: '',
+          recycle_time: '',
+          storage_capacity:'',
+          purchase_channel:'',
         },
+        deviceInfo: null,
+        imageList:[]
       };
     },
+    components: {
+      "seach": header,
+      // RepairHistory,
+      DropdownList,
+    },
+    mounted() {
+    // 接收上一个组件的值，并将其赋给data.product.productId
+      this.productId = this.$route.params.productId;
+      console.log("接收的 productId:", this.$route.params.productId);
+    },
+    created() {
+      this.getTypename();
+      this.fetchDeviceInfo();
+    },
     methods: {
+      calculatePrice() {
+        let basePrice = 100; // 设置基础价格
+        // 根据手机型号信息调整价格
+        if (this.form.deviceName === 'iphone') {
+          basePrice += 80;
+        } else if (this.form.deviceName === '华为') {
+          basePrice += 80;
+        } else if (this.form.deviceName === '小米') {
+          basePrice += 50;
+        } else if (this.form.deviceName === '三星') {
+          basePrice += 50;
+        } else if (this.form.deviceName === 'oppo') {
+          basePrice += 50;
+        } else if (this.form.deviceName === 'vivo') {
+          basePrice += 50;
+        } else if (this.form.deviceName === '联想') {
+          basePrice += 100;
+        } else if (this.form.deviceName === '索尼') {
+          basePrice += 100;
+        } else if (this.form.deviceName === '戴尔') {
+          basePrice += 100;
+        } else if (this.form.deviceName === '任天堂') {
+          basePrice += 150;
+        } 
+        if (this.form.problem === '设备磨损') {
+          basePrice += 100;
+        } else if (this.form.problem === '设备屏幕损毁（出现裂缝，黑屏等）') {
+          basePrice += 500;
+        } else if (this.form.problem === '设备系统出现损坏') {
+          basePrice += 200;
+        } else if (this.form.problem === '设备镜头损坏') {
+          basePrice += 300;
+        } else if (this.form.problem === '设备音响出现问题（没有声音，声音刺耳等问题）') {
+          basePrice += 200;
+        } else if (this.form.problem === '设备无法开机问题') {
+          basePrice += 50;
+        } else if (this.form.problem === '设备出现卡顿，死机问题') {
+          basePrice += 60;
+        } 
+
+        return basePrice;
+      },
       selectOption(option) {
         this.selectedOption = option;
         this.$emit('option-selected', option);
-
-      },
-      submitForm() {
-          this.$router.push({ name: 'recycleprice' });
-          
-
       },
       goback() {
         this.$router.push({ name: 'DetailsPage' });
-      }
+      },
+      getTypename(){
+        this.productId = this.$route.params.productId;
+      },
+      fetchDeviceInfo() {
+      axios.get(`http://110.42.220.245:8081/DeviceType/${this.productId}`)
+        .then(response => {
+          console.log("到了1")
+          this.deviceInfo = response.data;
+          console.log(this.deviceInfo)
+          // 将图片也更新
+          this.imageList = this.deviceInfo.DeviceType[0].Structure_Url.map((url, index) => ({
+          id: index + 1,
+          url: url
+        }));
+        this.product.srcList = this.deviceInfo.DeviceType[0].Structure_Url;
+      })
+        .catch(error => {
+          console.error('请求错误:', error);
+        });
+      },
+      async goToPricePage() {
+        try {
+          // 构造要传递给PricePage的数据
+          this.form.expectedprice = this.calculatePrice();
+          console.log('计算得到的价格:',  this.form.expectedprice);
+          const dataToPass = {
+            form: this.form,
+            uploadedImages: this.uploadedImages,            
+            productId:this.productId,
+          };
+          console.log("传递的数据", dataToPass);
+          // 使用query参数传递数据，而不是params
+          this.$router.push({
+            name: 'recycleprice',
+            query: {
+              data: JSON.stringify(dataToPass),
+            },
+          
+          });
+          
+        } catch (error) {
+          console.error('Error navigating to PricePage:', error);
+        }
+      },
     },
     handleOptionSelected(option) {
         console.log('选中的存储容量:', option);
         // 在这里处理选中的存储容量
+        this.form.storage_capacity = option;
     },
-    async submitForm() {
-      try {
-        // Construct the data to send to the backend
-        const createdata = {
-          Device_Cate:"phone",
-          Device_Type:"iPhone6",
-          ExpectedPrice:100,
-          Recycle_Location:"home",
-          Recycle_Time:"2023-08-10T15:25:00"
-
-        };
-
-
-        // Call your API function to create the repair order
-        await createRecycleOrder(createdata);
-        
-        // if (createResponse.data.success) {
-        //   console.log('回收订单创建成功:', createResponse.data);
-
-        //   // 获取创建的回收订单信息
-        //   const getOrderResponse = await repair_info({ uid: this.userId }); // 根据需要传入用户ID
-
-        //   console.log('获取回收订单信息:', getOrderResponse.data);
-          
-        //   // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
-        //   // this.$router.push({ name: 'orderDetails', params: { orderId: getOrderResponse.data.orders.OrderID } });
-        // } else {
-        //   console.error('回收订单创建失败:', createResponse.data);
-        //   // 处理订单创建失败的情况，显示错误提示等
-        // }
-      } catch (error) {
-        console.error('Error creating order:', error);
-        // Handle the error as needed
-      }
-    },
-    components: {
-      "seach": header,
-      StorageGroup,
-      RepairHistory,
-      DropdownList,
-    },
+      
+   
+   
   };
   </script>
   
   <style>
-
-
-.order-button {
-  display: flex;
-  justify-content: flex-end;
+  /* 样式按字母顺序重新排列 */
   
-  margin-top: 10px; /* 调整底部间距 */
-  margin-right: 20px; /* 调整右侧间距 */
-  font-size: 15px; /* 调整按钮字体大小 */
-  padding: 20px 40px; /* 增加按钮内边距 */
-}
-
-.__services{
+  .__services {
     display: flex;
     margin-bottom: 20px;
-}
+  }
   
-.storage-group {
-    margin-bottom: 20px;
-}
-
-.group-title {
-font-size: 18px;
-font-weight: bold;
-}
-
-.btn-group {
-margin-top: 10px;
-}
-
-.product-recycle {
-display: flex;
-justify-content: space-between;
-}
-
-.container {
-display: flex;
-justify-content: center;
-margin-top: 50px;
-}
-
-.centered-steps {
-width: 50%;
-}
-
-.left-panel {
-flex: 1;
-margin-left: 400px;
-margin-top: 100px;
-}
-
-.right-panel {
-right: 100px;
-flex: 2;
-}
-
-.gray-icon {
+  .btn-group {
+    margin-top: 10px;
+  }
+  
+  .centered-container {
+    display: flex;
+    align-items: center; /* 垂直居中容器内的内容 */
+  }
+  
+  .centered-steps {
+    width: 50%;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+  
+  .gray-icon {
     color: #888;
     font-size: 18px;
     margin-right: 5px;
-}
+  }
+  
+  .gray-text {
+    color: #888;
+    font-size: 12px;
+    margin-right: 20px;
+    margin-bottom: 0px;
+  }
+  
+  .group-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .h1 {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .h2 {
+    font-size: 18px;
+  }
+  
+  .input {
+    width: 300px;
+  }
+  
+  .left-panel {
+    flex: 1;
+    margin-top: 100px;
+    margin-right: 20px;
+  }
 
-.gray-text {
-color: #888;
-font-size: 12px;
-margin-right: 20px;
-margin-bottom: 0px;
-}
-
-.product-info {
-padding: 20px;
-margin-left: 50px;
-margin-bottom: 0%;
-}
-
-h1 {
-font-size: 24px;
-font-weight: bold;
-}
-
-h2 {
-font-size: 18px;
-}
-
-.input{
-width: 300px;
-}
-
-.product-form {
-position: relative;
-margin-top: 0px;;
-margin-left: 20px;
-}
-</style>
+  .options-container {
+  display: flex;
+  align-items: center;
+  }
+  
+  .order-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px; /* 调整底部间距 */
+    margin-right: 20px; /* 调整右侧间距 */
+    font-size: 15px; /* 调整按钮字体大小 */
+    padding: 20px 40px; /* 增加按钮内边距 */
+  }
+  
+  .product-form {
+    position: relative;
+    margin-top: 0px;
+    margin-left: 20px;
+  }
+  
+  .product-info {
+    padding: 20px;
+    margin-left: 50px;
+    margin-bottom: 0%;
+  }
+  
+  .product-recycle {
+    display: flex;
+    justify-content: center; /* 水平居中整个 product-recycle 区域 */
+    align-items: flex-start; /* 顶部对齐项目 */
+  }
+  
+  .right-panel {
+    text-align: left; /* 设置整个 right-panel 的文本内容为左对齐 */
+    margin-left: 20px;
+  }
+  
+  .right-panel h1,
+  .right-panel h2,
+  .right-panel p {
+    text-align: left; /* 设置 h1、h2、p 元素的文本内容为左对齐 */
+  }
+  
+  .storage-group {
+    margin-bottom: 20px;
+  }
+  
+  </style>
+  
   

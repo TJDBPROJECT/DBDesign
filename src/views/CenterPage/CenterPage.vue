@@ -96,6 +96,10 @@ export default {
   },
   mounted() {
     this.fetchServiceCenterData(); // Fetch service center data from the server
+
+    this.productId = this.$route.params.productId;
+    console.log("接收的 productId:", this.productId);
+    this.fetchServiceCenterData(); // 获取数据的方法，你可能需要调整
   },
   methods: {
 
@@ -121,8 +125,18 @@ export default {
     //   this.$router.push({ name: 'ExamplePage', params: { centerId } });
     // },
     
+    // navigateToExamplePage(centerId, centerData) {
+    //   this.$router.push({ name: 'ExamplePage', params: { centerId }, state: { centerData } });
+
+    // },
+
     navigateToExamplePage(centerId, centerData) {
-      this.$router.push({ name: 'ExamplePage', params: { centerId }, state: { centerData } });
+      this.$router.push({
+        name: 'ExamplePage',
+        params: { centerId },
+        query: { productId: this.productId },
+        state: { centerData }
+      });
     },
 
     // async fetchServiceCenterData() {

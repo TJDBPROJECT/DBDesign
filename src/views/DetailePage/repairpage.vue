@@ -58,10 +58,27 @@
                 <el-input v-model="form.phone"></el-input>
               </el-descriptions-item>
               <el-descriptions-item label="维修服务地点" label-align="center" align="center">
-                <el-input v-model="form.location"></el-input>
+                  <el-select v-model="form.location">
+                  <el-option label="北京" value="北京" />
+                  <el-option label="上海" value="上海" />
+                  <el-option label="广东" value="广东" />
+                  <!-- 添加其他地点选项 -->
+               </el-select>
               </el-descriptions-item>
               <el-descriptions-item label="设备名称" label-align="center" align="center">
-                <el-input v-model="form.deviceName"></el-input>
+                <el-select v-model="form.deviceName">
+                  <el-option label="iphone" value="iphone" />
+                  <el-option label="华为" value="华为" />
+                  <el-option label="小米" value="小米" />
+                  <el-option label="三星" value="三星" />
+                  <el-option label="oppo" value="oppo" />
+                  <el-option label="vivo" value="vivo" />
+                  <el-option label="联想" value="联想" />
+                  <el-option label="索尼" value="索尼" />
+                  <el-option label="戴尔" value="戴尔" />
+                  <el-option label="任天堂" value="任天堂" />
+                  <!-- 添加其他地点选项 -->
+               </el-select>
               </el-descriptions-item>
               <el-descriptions-item
                 label="设备是否还在保修时间内"
@@ -76,15 +93,25 @@
               <el-descriptions-item label="期待的上门服务时间" label-align="center" align="center">
                 <el-date-picker v-model="form.serviceTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
               </el-descriptions-item>
+              <el-descriptions-item label="设备故障类型" label-align="center" align="center">
+                <el-select v-model="form.problem">
+                  <el-option label="设备磨损" value="设备磨损" />
+                  <el-option label="设备屏幕损毁（出现裂缝，黑屏等）" value="设备屏幕损毁，出现裂缝，黑屏等损坏" />
+                  <el-option label="设备系统出现损坏" value="设备系统出现损坏" />
+                  <el-option label="设备镜头损坏" value="设备镜头损坏" />
+                  <el-option label="设备音响出现问题（没有声音，声音刺耳等问题）" value="设备音响出现问题（没有声音，声音刺耳等问题）" />
+                  <el-option label="设备无法开机问题" value="设备无法开机问题" />
+                  <el-option label="设备出现卡顿，死机问题" value="设备出现卡顿，死机问题" />
+                  <!-- 添加其他地点选项 -->
+               </el-select>
+              </el-descriptions-item>
               <el-descriptions-item
-                label="设备故障信息描述（请详细说明）"
+                label="设备故障信息详情描述（请补充说明设备损坏的具体情况）"
                 label-align="center"
                 align="center"
               >
                 <el-input type="textarea" v-model="form.problemDescription"></el-input>
               </el-descriptions-item>
-
-
               <el-descriptions-item label="工程师名称" label-align="center" align="center">
                 <el-popover v-if="form.engineer" trigger="hover" placement="right-start" width="200">
                   <template #reference>
@@ -105,9 +132,6 @@
                   <el-option v-for="engineer in engineersData" :key="engineer.ID" :label="engineer.Name" :value="engineer.ID"></el-option>
                 </el-select>
               </el-descriptions-item>
-
-
-
             </el-descriptions>
           </div>
         </el-main>
@@ -123,15 +147,16 @@
     <!-- 添加下单按钮 -->
     <div class="order-button">
 
+      <!-- <el-button type="text" @click="go_center" class="site-details-button">维修站点详情</el-button> -->
       <el-button type="text" @click="go_center" class="site-details-button">维修站点详情</el-button>
+
       <el-button type="primary" @click="goback" class="order-button">返回</el-button>
-      <el-button type="primary" @click="submitForm" class="order-button">支付</el-button>
+      <el-button type="primary" @click="goToPricePage" class="order-button">支付</el-button>
 
     </div>
 </template>
 
 <script>
-import { createRepairOrder,repair_info } from '@/api/repair_info.js'
 //import { getEngineer } from '@/api/repair_info.js';
 import axios from 'axios';
 
@@ -140,13 +165,14 @@ export default {
   data() {
     return {
       form: {
-        brand: '',
-        model: '',
-        storage: '',
-        purchaseChannel: '',
-        appearance: '',
-        display: '',
-        repair: '',
+        name:'',
+        phone:'',
+        location:'',
+        deviceName:'',
+        isWarranty:'',
+        serviceTime:'',
+        problem:'',
+        problemDescription:'',
         uploadedImages: [], // Store uploaded image URLs
       },
       productId:null,
@@ -160,26 +186,26 @@ export default {
       // ],
     };
   },
-  mounted() {
+    mounted() {
     // 接收上一个组件的值，并将其赋给data.product.productId
       this.productId = this.$route.params.productId;
       console.log("接收的 productId:", this.$route.params.productId);
       this.fetchEngineersData(); // 在组件挂载时获取工程师数据
+    },
+
+  /*created() {
+    // 在组件创建时调用getEngineer函数，获取工程师数据
+    //this.fetchEngineersData();
   },
 
-  // created() {
-  //   // 在组件创建时调用getEngineer函数，获取工程师数据
-  //   this.fetchEngineersData();
-  // },
-
-  // watch: {
-  //   'form.engineer': function (newVal) {
-  //     // 通过工程师的值，查找对应的个人信息并赋值给selectedEngineer
-  //     this.selectedEngineer = this.engineersData.find((engineer) => engineer.value === newVal);
-  //     // 控制个人名片是否显示的标志
-  //     this.showPopoverContent = !!this.selectedEngineer;
-  //   }
-  // },
+  watch: {
+    'form.engineer': function (newVal) {
+      // 通过工程师的值，查找对应的个人信息并赋值给selectedEngineer
+      this.selectedEngineer = this.engineersData.find((engineer) => engineer.value === newVal);
+      // 控制个人名片是否显示的标志
+      this.showPopoverContent = !!this.selectedEngineer;
+    }
+  },*/
   watch: {
   'form.engineer': function (newVal) {
     this.selectedEngineer = this.engineersData.find(engineer => engineer.ID === newVal);
@@ -188,6 +214,53 @@ export default {
 
 
   methods: {
+    go_center() {
+      this.$router.push({ name: 'CenterPage', params: { productId: this.productId } });
+      // this.$router.push({ name: 'CenterPage', params: { productId: this.product.productId } });
+    },
+    /*专门用来估算设备价格的函数*/ 
+    calculatePrice() {
+      let basePrice = 100; // 设置基础价格
+      // 根据手机型号信息调整价格
+      if (this.form.deviceName === 'iphone') {
+        basePrice += 80;
+      } else if (this.form.deviceName === '华为') {
+        basePrice += 80;
+      } else if (this.form.deviceName === '小米') {
+        basePrice += 50;
+      } else if (this.form.deviceName === '三星') {
+        basePrice += 50;
+      } else if (this.form.deviceName === 'oppo') {
+        basePrice += 50;
+      } else if (this.form.deviceName === 'vivo') {
+        basePrice += 50;
+      } else if (this.form.deviceName === '联想') {
+        basePrice += 100;
+      } else if (this.form.deviceName === '索尼') {
+        basePrice += 100;
+      } else if (this.form.deviceName === '戴尔') {
+        basePrice += 100;
+      } else if (this.form.deviceName === '任天堂') {
+        basePrice += 150;
+      } 
+      if (this.form.problem === '设备磨损') {
+        basePrice += 100;
+      } else if (this.form.problem === '设备屏幕损毁（出现裂缝，黑屏等）') {
+        basePrice += 500;
+      } else if (this.form.problem === '设备系统出现损坏') {
+        basePrice += 200;
+      } else if (this.form.problem === '设备镜头损坏') {
+        basePrice += 300;
+      } else if (this.form.problem === '设备音响出现问题（没有声音，声音刺耳等问题）') {
+        basePrice += 200;
+      } else if (this.form.problem === '设备无法开机问题') {
+        basePrice += 50;
+      } else if (this.form.problem === '设备出现卡顿，死机问题') {
+        basePrice += 60;
+      } 
+
+      return basePrice;
+    },
     onEngineerChange() {
       this.selectedEngineer = this.engineersData.find(engineer => engineer.ID === this.form.engineer);
       this.showPopoverContent = !!this.selectedEngineer;
@@ -201,7 +274,6 @@ export default {
       console.error('获取工程师数据失败:', error);
     }
   },
-
     sendTimeToBackend() {
       const currentTime = new Date();
       const formattedTime = currentTime.toISOString(); // You can format the time as needed
@@ -229,14 +301,14 @@ export default {
     },
 
     
-    // fetchEngineersData() {
-    //   // 调用getEngineer函数获取工程师数据
-    //   getEngineer({}).then((response) => {
-    //     this.engineersData = response.data; // 将获取到的工程师数据赋值给engineersData
-    //   }).catch((error) => {
-    //     console.error('Error fetching engineers data:', error);
-    //   });
-    // },
+    /*fetchEngineersData() {
+      // 调用getEngineer函数获取工程师数据
+      getEngineer({}).then((response) => {
+        this.engineersData = response.data; // 将获取到的工程师数据赋值给engineersData
+      }).catch((error) => {
+        console.error('Error fetching engineers data:', error);
+      });
+    },*/
 
 
     handleFileUpload(event) {
@@ -245,57 +317,55 @@ export default {
       this.form.photo = file;
     },
    
-    async submitForm() {
+    async goToPricePage() {
       try {
-        // Construct the data to send to the backend
-        const createdata = {
-          CouponID: "cou123",
-          EngineerID:"eng001",
-          OptionID: "opt123",
-          RepairLocation: "TBD",
-          RepairTime: "2023-08-03T15:31:57",
+         // 构造要传递给PricePage的数据
+         const price = this.calculatePrice();
+         console.log('计算得到的价格:', price);
+         const dataToPass = {
+          form: this.form,
+          uploadedImages: this.uploadedImages,
+          price: price, // 将计算得到的价格传递给PricePage
+          productId:this.productId,
         };
-
-        /*const orderData = {
-          username: this.form.name,
-          telephone: this.form.phone,
-          repairlocation: this.form.location,
-          type_name: this.form.deviceName,
-          repairtime: this.form.serviceTime,
-          repairrequirement: this.form.problemDescription,
-          photo: '', // Add the photo data here
-        };*/
-
-        // Call your API function to create the repair order
-        const createResponse = await createRepairOrder(createdata);
+        console.log("传递的数据", dataToPass);
+         // 使用query参数传递数据，而不是params
+         this.$router.push({
+          name: 'pricepage',
+          query: {
+            data: JSON.stringify(dataToPass),
+          },
+         
+        });
         
-        if (createResponse.data.success) {
-          console.log('维修订单创建成功:', createResponse.data);
-          
-          // 获取创建的维修订单信息
-          const getOrderResponse = await repair_info({ uid: this.userId }); // 根据需要传入用户ID
-
-          console.log('获取维修订单信息:', getOrderResponse.data);
-          this.$router.push({ name: 'pricepage' });
-          // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
-          // this.$router.push({ name: 'orderDetails', params: { orderId: getOrderResponse.data.orders.OrderID } });
-        } else {
-          console.error('维修订单创建失败:', createResponse.data);
-          // 处理订单创建失败的情况，显示错误提示等
-        }
       } catch (error) {
-        console.error('Error creating order:', error);
-        // Handle the error as needed
+        console.error('Error navigating to PricePage:', error);
       }
     },
-    go_center() {
-      this.$router.push({ name: 'CenterPage' });
+    // go_center() {
+    //   this.$router.push({ name: 'CenterPage' });
 
+    // },
+    async goback() {
+      try {
+         // 构造要传递给repairpage的数据
+         const dataToPass = {
+          productId:this.productId,
+        };
+        console.log("传递的数据", dataToPass);
+         // 使用query参数传递数据，而不是params
+         this.$router.push({
+          name: 'DetailsPage',
+          query: {
+            data: JSON.stringify(dataToPass),
+          },
+         
+        });
+        
+      } catch (error) {
+        console.error('Error navigating to DetailsPage:', error);
+      }
     },
-    goback() {
-      this.$router.push({ name: 'DetailsPage' });
-
-    }
   }
   
 };
@@ -320,14 +390,6 @@ export default {
   margin-bottom: 20px;
   margin-left: -200px; /* 调整左边距的值 */
 }
-
-
-/* .el-descriptions {
-  background-color: #57387b;
-  width:80%;
-} 
-脑残紫色原因
-*/
 
 
 .carousel-container {
