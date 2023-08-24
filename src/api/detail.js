@@ -9,7 +9,7 @@ export function pictureget() {
   }
 
   /*详情信息*/
-//等后端完善数据库
+
 export function getdevicedata(params) {
   return request({
     url: '/DeviceType/{name}',

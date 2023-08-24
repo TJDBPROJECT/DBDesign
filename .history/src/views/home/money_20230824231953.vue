@@ -76,19 +76,16 @@ export default {
       form: {
         cardID: '',
         bank: '',
-        password: '',
       },
       chargeForm: {
         amount: '',
-        selectedCard: '',
-        password: '',
+        selectedCard: '', // New property for selected card
       },
       withdrawForm: {
         amount: '',
-        selectedCard: '',
-        password: '',
+        selectedCard: '', // New property for selected card
       },
-      bankCards: [],
+      bankCards: [], // Array of available bank cards
     };
   },
   methods: {
@@ -97,20 +94,20 @@ export default {
       const data = {
         CardID: this.form.cardID,
         Bank: this.form.bank,
-        Password: this.form.password,
+        SelectedCard: this.form.selectedCard, // Add the selected card
       };
 
       axios
         .post(url, data)
         .then(response => {
-          console.log("get");
-          console.log(response);
+          console.log("get")
+          console.log(response)
           if (response.data.success) {
             this.$message.success('添加银行卡成功');
+            // Clear form data
             this.form.cardID = '';
             this.form.bank = '';
-            this.form.password = '';
-            this.fetchBankCards();
+            this.fetchBankCards(); // Fetch updated bank cards after successful addition
           } else {
             this.$message.error('添加银行卡失败');
           }
@@ -122,15 +119,12 @@ export default {
     },
     chargeAccount() {
       const url = `http://110.42.220.245:8081/Balance/Charge/${this.userid}?num=${this.chargeForm.amount}`;
-      const data = {
-        Password: this.chargeForm.password,
-      };
 
       axios
-        .post(url, data)
+        .post(url)
         .then(response => {
-          console.log("charge");
-          console.log(response);
+          console.log("charge")
+          console.log(response)
           if (response.data.success) {
             this.$message.success('充值成功');
             // Clear form data
@@ -148,15 +142,12 @@ export default {
     },
     withdrawAccount() {
       const url = `http://110.42.220.245:8081/Balance/Withdrawal/${this.userid}?num=${this.withdrawForm.amount}`;
-      const data = {
-        Password: this.withdrawForm.password,
-      };
 
       axios
-        .post(url, data)
+        .post(url)
         .then(response => {
-          console.log("take");
-          console.log(response);
+          console.log("take")
+          console.log(response)
           if (response.data.success) {
             this.$message.success('提现成功');
             // Clear form data
@@ -172,19 +163,30 @@ export default {
           this.$message.error('提现时出现错误');
         });
     },
-    fetchBankCards() { 
-      const url = `http://110.42.220.245:8081/CreditCard/${this.userid}`; 
-      axios.get(url).then(response => { 
-        console.log("know")
-         console.log(response)
-          if (response.data) { this.bankCards = response.data.cards; } 
-          else { this.$message.error('获取银行卡列表失败'); } }).catch(error => { console.log(error); 
-            this.$message.error('获取银行卡列表时出现错误'); }); },
+    fetchBankCards() {
+      const url = `http://110.42.220.245:8081/CreditCard/${this.userid}`;
+
+      axios
+        .get(url)
+        .then(response => {
+          console.log("know")
+          console.log(response)
+          if (response.data) {
+            this.bankCards = response.data.cards; // Modify the assignment to response.data.cards
+          } else {
+            this.$message.error('获取银行卡列表失败');
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error('获取银行卡列表时出现错误');
+        });
+    },
   },
   created() {
     this.fetchBankCards();
   },
-};  
+};
 </script>
 
 <style>

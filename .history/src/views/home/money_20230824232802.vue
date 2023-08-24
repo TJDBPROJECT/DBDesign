@@ -172,16 +172,21 @@ export default {
           this.$message.error('提现时出现错误');
         });
     },
-    fetchBankCards() { 
-      const url = `http://110.42.220.245:8081/CreditCard/${this.userid}`; 
-      axios.get(url).then(response => { 
-        console.log("know")
-         console.log(response)
-          if (response.data) { this.bankCards = response.data.cards; } 
-          else { this.$message.error('获取银行卡列表失败'); } }).catch(error => { console.log(error); 
-            this.$message.error('获取银行卡列表时出现错误'); }); },
+    fetchBankCards() {
+      const url = `http://110.42.220.245:8081/CreditCard/${this.userid}`;
+
+      axios
+        .get(url)
+        .then(response => {
+          this.bankCards = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error('获取银行卡列表时出现错误');
+        });
+    },
   },
-  created() {
+  mounted() {
     this.fetchBankCards();
   },
 };  

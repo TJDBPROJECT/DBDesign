@@ -218,16 +218,16 @@
       fetchDeviceInfo() {
       axios.get(`http://110.42.220.245:8081/DeviceType/${this.productId}`)
         .then(response => {
-          console.log("到了1")
-          this.deviceInfo = response.data;
-          console.log(this.deviceInfo)
-          // 将图片也更新
-          this.imageList = this.deviceInfo.DeviceType[0].Structure_Url.map((url, index) => ({
-          id: index + 1,
-          url: url
-        }));
-        this.product.srcList = this.deviceInfo.DeviceType[0].Structure_Url;
-      })
+            console.log("到了1")
+            this.deviceInfo = response.data;
+            console.log(this.deviceInfo)
+            // 将图片也更新
+            this.imageList = this.deviceInfo.DeviceType[0].Structure_Url.map((url, index) => ({
+            id: index + 1,
+            url: url
+          }));
+          this.product.srcList = this.deviceInfo.DeviceType[0].Structure_Url;
+        })
         .catch(error => {
           console.error('请求错误:', error);
         });

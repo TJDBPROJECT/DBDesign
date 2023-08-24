@@ -15,11 +15,13 @@ export function sendInfo(params,UserID) {
       'Content-Type': 'application/json'
     },
     data: {
-      Name:params.name,
+      Password: params.password,
       UserName: params.username,
       Telephone:params.phone,
       Email: params.email,
-      Identity:params.identity,
+      Identity: params.identity,
+      Name: params.name,
+
     }
   })
 }

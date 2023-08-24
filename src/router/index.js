@@ -95,7 +95,7 @@ const routes = [
   {//进入回收页
 
     path: '/recoverypage/:productId',
-    name: 'recoverypage',
+    name: 'RecoveryPage',
     component: () => import(/* webpackChunkName: "DetailsPage" */ '../views/DetailePage/RecoveryPage.vue')
 
   },
