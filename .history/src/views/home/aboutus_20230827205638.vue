@@ -17,7 +17,7 @@
                 <div class="chat-input">
                     <el-select v-model="selectedQuestion" placeholder="请选择问题">
                         <el-option v-for="question in questions" :key="question.ID" :label="question.Question"
-                            :value="question.ID"></el-option>
+                            :value="question"></el-option>
                     </el-select>
                     <el-button class="send-button" type="primary" :style="{ backgroundColor: '#00BFFF' }"
                         @click="sendMessage">发送</el-button>
@@ -67,7 +67,7 @@ export default {
                 });
         },
         sendMessage() {
-            const question = this.questions.find((q) => q.ID === this.selectedQuestion);
+            const question = this.selectedQuestion;
             if (question) {
                 this.messages.push({ type: 'user', content: question.Question });
                 this.messages.push({ type: 'service', content: question.Answer });

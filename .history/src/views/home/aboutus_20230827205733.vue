@@ -67,7 +67,7 @@ export default {
                 });
         },
         sendMessage() {
-            const question = this.questions.find((q) => q.ID === this.selectedQuestion);
+            const question = this.selectedQuestion;
             if (question) {
                 this.messages.push({ type: 'user', content: question.Question });
                 this.messages.push({ type: 'service', content: question.Answer });
@@ -151,4 +151,5 @@ export default {
 
 .send-button {
     margin-left: 10px;
-}</style>
+}
+</style>

@@ -15,6 +15,7 @@
                     </div>
                 </div>
                 <div class="chat-input">
+                    <el-avatar class="avatar user-avatar" :src="userAvatar"></el-avatar>
                     <el-select v-model="selectedQuestion" placeholder="请选择问题">
                         <el-option v-for="question in questions" :key="question.ID" :label="question.Question"
                             :value="question.ID"></el-option>
@@ -67,7 +68,7 @@ export default {
                 });
         },
         sendMessage() {
-            const question = this.questions.find((q) => q.ID === this.selectedQuestion);
+            const question = this.selectedQuestion;
             if (question) {
                 this.messages.push({ type: 'user', content: question.Question });
                 this.messages.push({ type: 'service', content: question.Answer });
