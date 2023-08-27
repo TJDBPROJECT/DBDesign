@@ -24,24 +24,14 @@
           </template>
           <!-- 累计订单数量、已完成数量、累计消费、钱包余额统计 -->
           <el-row class="statistic-row">
-            <el-col :span="6">
-              <el-statistic title="累计订单数量" :value="55" />
+            <el-col :span="8">
+              <el-statistic title="累计回收订单" :value="recycleData.length" />
             </el-col>
-            <el-col :span="6">
-              <el-statistic :value="53">
-                <template #title>
-                  <div class="title-wrapper">
-                    <span class="title-text">已完成数量</span>
-                  </div>
-                </template>
-                <template #suffix>/55</template>
-              </el-statistic>
+            <el-col :span="8">
+              <el-statistic title="累计维修订单" :value="repairData.length" />
             </el-col>
-            <el-col :span="6">
-              <el-statistic title="累计消费" :value="1720" />
-            </el-col>
-            <el-col :span="6">
-              <el-statistic title="钱包余额" :value="562" />
+            <el-col :span="8">
+              <el-statistic title="钱包余额" :value="userInfo.balance" />
             </el-col>
           </el-row>
         </el-collapse-item>
@@ -171,6 +161,7 @@ import {
 
 import { computed, ref } from 'vue'
 import { getUserProfile } from '@/api/mainhome.js'
+import { getRepairOrderInfo, getRecycleOrderInfo } from '@/api/order.js';
 import { mapState} from 'vuex';
 
 const size = ref('')
@@ -212,6 +203,8 @@ export default {
                 email: "",
                 identity: ""
             },
+            repairData: [],
+            recycleData: [],
             editedUserInfo: {
 
             }, // 用于保存编辑后的数据
@@ -235,8 +228,40 @@ export default {
           this.userInfo.telephone= res.data[0].telephone
           this.userInfo.email=res.data[0].email
           this.userInfo.identity= res.data[0].identity
+          this.userInfo.balance= res.data[0].balance
         }
+      });
+
+      console.log("尝试获取维修订单信息")
+      getRepairOrderInfo(this.userid)
+      .then((res) => {
+        // 处理返回的用户个人资料数据
+        console.log("拿数据成功");
+        console.log(this.userid);
+        console.log('Response Data:', res.data); // 打印获取到的数据
+        this.repairData = res.data.repair_order; // 将获取到的数据存储到repairData中
       })
+      .catch((error) => {
+        // 处理错误
+        console.log("拿数据失败");
+        console.error('Error:', error); // 打印错误信息
+      });
+
+    console.log("尝试获取回收订单信息")
+    getRecycleOrderInfo(this.userid)
+      .then((res) => {
+        // 处理返回的用户个人资料数据
+        console.log("拿数据成功");
+        console.log(this.userid);
+        console.log('Response Data:', res.data); // 打印获取到的数据
+        this.recycleData = res.data.recycle_order; // 将获取到的数据存储到recycleData中
+      })
+      .catch((error) => {
+        // 处理错误
+        console.log("拿数据失败");
+        console.error('Error:', error); // 打印错误信息
+      });
+
   },
     components: {
         Iphone,

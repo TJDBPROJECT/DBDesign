@@ -151,7 +151,6 @@
         this.$message.success("获得成功");
         this.products = res.data.DeviceType; // 直接使用API响应的数据
         this.currentimageUrl = res.data.DeviceType; // 直接使用API响应的数据
-        console.log(this.currentimageUrl);
       }
       }).catch((error) => {
         console.error("获取图片数据时出现错误:", error);
@@ -187,15 +186,14 @@
       goBack() {
         // 根据previousPage的值来决定导航的目标页面
         console.log(this.previousPage.path)
-        if (this.previousPage.path === '/evaluatepage') {
+        if (this.previousPage.path == '/evaluatepage') {
           // 如果来源页面是evaluatepage，则导航回evaluatepage
           this.$router.push({ name: "evaluatepage" });
-        } else if (this.previousPage.path === '/mainpage') {
+        } else if (this.previousPage.path == '/mainpage') {
           // 如果来源页面是mainpage，则导航回mainpage
           this.$router.push({ name: "mainpage" });
         } else {
-          // 其他情况，采取默认导航行为，可能是直接进入DetailsPage的情况
-          this.$router.go(-1);
+          this.$router.push({ name: "mainpage" });
         }
       },
       getTypename(){
@@ -213,6 +211,7 @@
           url: url
         }));
         this.product.srcList = this.deviceInfo.DeviceType[0].Structure_Url;
+        this.product.currentimageUrl = this.product.srcList[0]
       })
         .catch(error => {
           console.error('请求错误:', error);

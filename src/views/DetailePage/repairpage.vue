@@ -11,30 +11,22 @@
      
       <el-container>
     <!-- 左侧图片区域 -->
+    <!-- 左侧图片上传区域 -->
     <el-aside class="aside-center">
-
-    
-    <div class="upload-container upload-container-large">
-      <el-upload
-        class="upload-demo"
-        drag
-        action="/api/CateImage" 
-        multiple
-        :on-success="handleUploadSuccess"
-      >
-      <h1>请上传维修机器的相关照片，且内存小于500KB</h1>
-        <!-- ... Your upload icon and text ... -->
-      </el-upload>
-    </div>
-    
+      <div class="upload-container upload-container-large">
+        <input type="file" @change="handleFileChange" />
+      </div>
+      <!-- 图片预览走马灯 -->
     <div class="carousel-container">
       <el-carousel :interval="5000" arrow="always">
-        <el-carousel-item v-for="(image, index) in uploadedImages" :key="index">
-          <img :src="image" alt="Uploaded Image" style="width: 100%;" />
+        <el-carousel-item v-for="(image, index) in form.uploadedImages" :key="index">
+          <img :src="image" :alt="'Uploaded Image ' + index" style="width: 100%;" />
         </el-carousel-item>
       </el-carousel>
     </div>
-  </el-aside>
+    </el-aside>
+
+    
 
         <el-main>
 
@@ -179,6 +171,7 @@ export default {
       showPopoverContent: false,
       selectedEngineer: null, // Initialize selectedEngineer
       engineersData: [], // Store the retrieved engineer data
+      
       // engineersData: [
       //   { value: "engineerA", name: "小盛", sex: "男", rating: 4.1, experience: "5年" },
       //   { value: "engineerB", name: "老默", sex: "男", rating: 4.9, experience: "3年" },
@@ -214,6 +207,26 @@ export default {
 
 
   methods: {
+    handleFileChange(event) {
+      const files = event.target.files;
+      for (const file of files) {
+        this.displayImage(file);
+      }
+    },
+    displayImage(file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.form.uploadedImages.push(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    },
+    beforeDestroy() {
+    // 释放 Blob URL 资源，避免内存泄漏
+      for (const url of this.uploadedImages) {
+        URL.revokeObjectURL(url);
+      }
+   } ,
+    
     go_center() {
       this.$router.push({ name: 'CenterPage', params: { productId: this.productId } });
       // this.$router.push({ name: 'CenterPage', params: { productId: this.product.productId } });
@@ -274,22 +287,6 @@ export default {
       console.error('获取工程师数据失败:', error);
     }
   },
-    sendTimeToBackend() {
-      const currentTime = new Date();
-      const formattedTime = currentTime.toISOString(); // You can format the time as needed
-
-      axios.post('/api/time', { currentTime: formattedTime }) // Replace with your API endpoint
-        .then(response => {
-          console.log('后端响应:', response.data);
-          // 根据需要处理后端的响应数据
-        })
-        .catch(error => {
-          console.error('请求错误:', error);
-          // 根据需要处理错误
-          // 输出错误信息
-          console.log('后端返回的错误信息:', error.response.data);
-        });
-    },
 
 
 
@@ -322,10 +319,14 @@ export default {
          // 构造要传递给PricePage的数据
          const price = this.calculatePrice();
          console.log('计算得到的价格:', price);
+         const currentTime = new Date();
+         const formattedTime = currentTime.toISOString().slice(0, 19); // 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
+         console.log('下单时间:', formattedTime);
          const dataToPass = {
           form: this.form,
           uploadedImages: this.uploadedImages,
           price: price, // 将计算得到的价格传递给PricePage
+          currentTime: formattedTime, // 下单的本地时间
           productId:this.productId,
         };
         console.log("传递的数据", dataToPass);
@@ -451,7 +452,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 200px; /* 调整上传组件容器的宽度 */
-  height: 200px; /* 调整上传组件容器的高度 */
+  height: 100px; /* 调整上传组件容器的高度 */
   border: 5px dashed #ccc;
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
