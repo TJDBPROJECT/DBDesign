@@ -8,16 +8,16 @@
       <ElInput placeholder="请输入密码" :prefix-icon="icons.Lock" v-model="registerForm.password" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem prop="name">
-      <ElInput placeholder="请输入姓名" :prefix-icon="icons.Message" v-model="registerForm.name" size="large"></ElInput>
+      <ElInput placeholder="请输入姓名" :prefix-icon="icons.Avatar" v-model="registerForm.name" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem prop="email">
       <ElInput placeholder="请输入邮箱" :prefix-icon="icons.Message" v-model="registerForm.email" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem prop="identity">
-      <ElInput placeholder="请输入身份证号码" :prefix-icon="icons.Message" v-model="registerForm.identity" size="large"></ElInput>
+      <ElInput placeholder="请输入身份证号码" :prefix-icon="icons.Promotion" v-model="registerForm.identity" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem prop="telephone">
-      <ElInput placeholder="请输入电话号码" :prefix-icon="icons.Message" v-model="registerForm.telephone" size="large"></ElInput>
+      <ElInput placeholder="请输入电话号码" :prefix-icon="icons.PhoneFilled" v-model="registerForm.telephone" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" class="register-btn" size="large" @click="zhuce">注册</ElButton> 
@@ -82,12 +82,12 @@ export default {
         ],
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
-          { min: 6, max: 20, message: "长度在 6 到 20 个字符的邮箱", trigger: "blur" },
+          { min: 6,  message: "邮箱不能为空", trigger: "blur" },
         ],
         // 设置姓名效验规则
         name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
-          { min: 4, max: 15, message: "长度在 4 到 16 个字符的姓名", trigger: "blur" },
+          { min: 0, max: 20, message: "姓名不能为空", trigger: "blur" },
         ],
         // 设置身份证效验规则
         identity: [

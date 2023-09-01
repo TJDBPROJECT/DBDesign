@@ -44,13 +44,13 @@
             <h2 class="descriptions-title">在下面表格中请填写你的用户信息</h2>
             <el-descriptions class="custom-descriptions" :column="1" border>
               <el-descriptions-item label="姓名" label-align="center" align="center">
-                <el-input v-model="form.name"></el-input>
+                <el-input v-model="this.name"></el-input>
               </el-descriptions-item>
               <el-descriptions-item label="联系电话" label-align="center" align="center" background-color=" blue">
-                <el-input v-model="form.phone"></el-input>
+                <el-input v-model="this.phone"></el-input>
               </el-descriptions-item>
               <el-descriptions-item label="维修服务地点" label-align="center" align="center">
-                  <el-select v-model="form.location">
+                  <el-select v-model="form.RepairLocation">
                   <el-option label="北京" value="北京" />
                   <el-option label="上海" value="上海" />
                   <el-option label="广东" value="广东" />
@@ -58,7 +58,7 @@
                </el-select>
               </el-descriptions-item>
               <el-descriptions-item label="设备名称" label-align="center" align="center">
-                <el-select v-model="form.deviceName">
+                <el-select v-model="form.Brand">
                   <el-option label="iphone" value="iphone" />
                   <el-option label="华为" value="华为" />
                   <el-option label="小米" value="小米" />
@@ -83,18 +83,30 @@
                 </el-radio-group>
               </el-descriptions-item>
               <el-descriptions-item label="期待的上门服务时间" label-align="center" align="center">
-                <el-date-picker v-model="form.serviceTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
+                <el-date-picker v-model="form.RepairTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
               </el-descriptions-item>
-              <el-descriptions-item label="设备故障类型" label-align="center" align="center">
-                <el-select v-model="form.problem">
+              <el-descriptions-item label="部件" label-align="center" align="center">
+                <el-select v-model="form.ProblemPart">
+                  <el-option label="镜头" value="镜头" />
+                  <el-option label="屏幕" value="屏幕" />
+                  <el-option label="音响" value="音响" />
+                  <el-option label="芯片" value="芯片" />
+                  <el-option label="其他" value="其他" />
+               </el-select>
+              </el-descriptions-item>
+              <el-descriptions-item label="故障类型" label-align="center" align="center">
+                <el-select v-model="form.ProblemDetail">
                   <el-option label="设备磨损" value="设备磨损" />
-                  <el-option label="设备屏幕损毁（出现裂缝，黑屏等）" value="设备屏幕损毁，出现裂缝，黑屏等损坏" />
-                  <el-option label="设备系统出现损坏" value="设备系统出现损坏" />
-                  <el-option label="设备镜头损坏" value="设备镜头损坏" />
-                  <el-option label="设备音响出现问题（没有声音，声音刺耳等问题）" value="设备音响出现问题（没有声音，声音刺耳等问题）" />
-                  <el-option label="设备无法开机问题" value="设备无法开机问题" />
-                  <el-option label="设备出现卡顿，死机问题" value="设备出现卡顿，死机问题" />
+                  <el-option label="设备损毁（已经无法使用）" value="设备屏幕损毁，出现裂缝，黑屏等损坏" />
+                  <el-option label="设备不灵敏" value="设备不灵敏" />
+                  <el-option label="设备更新" value="设备更新" />
                   <!-- 添加其他地点选项 -->
+               </el-select>
+              </el-descriptions-item>
+              <el-descriptions-item label="解决方法" label-align="center" align="center">
+                <el-select v-model="form.Requirement">
+                  <el-option label="更换部件" value="更换部件" />
+                  <el-option label="维修部件" value="维修部件" />
                </el-select>
               </el-descriptions-item>
               <el-descriptions-item
@@ -120,7 +132,7 @@
                     </div>
                   <!-- </el-popover>                       -->
                 </el-popover>
-                <el-select v-else v-model="form.engineer" placeholder="请选择工程师">
+                <el-select v-else v-model="form.EngineerID" placeholder="请选择工程师">
                   <el-option v-for="engineer in engineersData" :key="engineer.ID" :label="engineer.Name" :value="engineer.ID"></el-option>
                 </el-select>
               </el-descriptions-item>
@@ -157,17 +169,22 @@ export default {
   data() {
     return {
       form: {
-        name:'',
-        phone:'',
-        location:'',
-        deviceName:'',
-        isWarranty:'',
-        serviceTime:'',
-        problem:'',
+        CouponID:'',
+        EngineerID:"eng001",
+        OrderPrice:'',
+        ProblemPart:"",
+        ProblemDetail:'',
         problemDescription:'',
+        Requirement:'',
+        Brand:'',
+        RepairLocation:'',
+        RepairTime:'',
+        isWarranty:'',
         uploadedImages: [], // Store uploaded image URLs
       },
       productId:null,
+      name:'',
+      phone:'',
       showPopoverContent: false,
       selectedEngineer: null, // Initialize selectedEngineer
       engineersData: [], // Store the retrieved engineer data
@@ -235,41 +252,53 @@ export default {
     calculatePrice() {
       let basePrice = 100; // 设置基础价格
       // 根据手机型号信息调整价格
-      if (this.form.deviceName === 'iphone') {
+      if (this.form.Brand === 'iphone') {
         basePrice += 80;
-      } else if (this.form.deviceName === '华为') {
+      } else if (this.form.Brand === '华为') {
         basePrice += 80;
-      } else if (this.form.deviceName === '小米') {
+      } else if (this.form.Brand === '小米') {
         basePrice += 50;
-      } else if (this.form.deviceName === '三星') {
+      } else if (this.form.Brand === '三星') {
         basePrice += 50;
-      } else if (this.form.deviceName === 'oppo') {
+      } else if (this.form.Brand === 'oppo') {
         basePrice += 50;
-      } else if (this.form.deviceName === 'vivo') {
+      } else if (this.form.Brand === 'vivo') {
         basePrice += 50;
-      } else if (this.form.deviceName === '联想') {
+      } else if (this.form.Brand === '联想') {
         basePrice += 100;
-      } else if (this.form.deviceName === '索尼') {
+      } else if (this.form.Brand === '索尼') {
         basePrice += 100;
-      } else if (this.form.deviceName === '戴尔') {
+      } else if (this.form.Brand === '戴尔') {
         basePrice += 100;
-      } else if (this.form.deviceName === '任天堂') {
+      } else if (this.form.Brand === '任天堂') {
         basePrice += 150;
       } 
-      if (this.form.problem === '设备磨损') {
+
+      if (this.form.ProblemPart === '镜头') {
         basePrice += 100;
-      } else if (this.form.problem === '设备屏幕损毁（出现裂缝，黑屏等）') {
+      } else if (this.form.ProblemPart === '屏幕') {
         basePrice += 500;
-      } else if (this.form.problem === '设备系统出现损坏') {
+      } else if (this.form.ProblemPart === '音响') {
         basePrice += 200;
-      } else if (this.form.problem === '设备镜头损坏') {
+      } else if (this.form.ProblemPart === '芯片') {
+        basePrice += 400;
+      } else if (this.form.ProblemPart === '其他') {
+        basePrice += 200;
+      }
+      
+      if (this.form.ProblemDetail === '设备磨损') {
+        basePrice += 100;
+      } else if (this.form.ProblemDetail === '设备损毁（已经无法使用）') {
+        basePrice += 500;
+      } else if (this.form.ProblemDetail === '设备不灵敏') {
+        basePrice += 200;
+      } else if (this.form.ProblemDetail === '设备更新') {
         basePrice += 300;
-      } else if (this.form.problem === '设备音响出现问题（没有声音，声音刺耳等问题）') {
-        basePrice += 200;
-      } else if (this.form.problem === '设备无法开机问题') {
-        basePrice += 50;
-      } else if (this.form.problem === '设备出现卡顿，死机问题') {
-        basePrice += 60;
+      } 
+      if (this.form.Requirement === '更换部件') {
+        basePrice += 500;
+      } else if (this.form.Requirement === '维修部件') {
+        basePrice += 100;
       } 
 
       return basePrice;
@@ -319,6 +348,7 @@ export default {
          // 构造要传递给PricePage的数据
          const price = this.calculatePrice();
          console.log('计算得到的价格:', price);
+         this.form.OrderPrice=price;
          const currentTime = new Date();
          const formattedTime = currentTime.toISOString().slice(0, 19); // 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
          console.log('下单时间:', formattedTime);

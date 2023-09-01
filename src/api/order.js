@@ -7,13 +7,13 @@ export function getRecycleOrderInfo(id) {
   });
 }
 
-export function editRecycleOrderInfo(id, orderid, data) {
+export function deleteRecycleOrderInfo(id, orderid) {
   return request({
-    url: `http://110.42.220.245:8081/RecycleOrder/${id}/${orderid}`,
-    method: 'post',
-    data
+    url: '/RecycleOrder/' + id + '/' + orderid,
+    method: 'delete',
   });
 }
+
 
 export function getRepairOrderInfo(uid) {
   return request({
@@ -22,10 +22,16 @@ export function getRepairOrderInfo(uid) {
   });
 }
 
-export function editRepairOrderInfo(uid, id, data) {
+export function refundRepairOrder(uid,num) {
   return request({
-    url: `http://110.42.220.245:8081/RepairOrder/${uid}/${id}`,
+    url:  `/Balance/Charge/${uid}?num=${num}`,
     method: 'post',
-    data
+  });
+}
+
+export function deleteRepairOrderInfo(uid, id) {
+  return request({
+    url: '/RepairOrder/' + uid + '/' + id,
+    method: 'delete',
   });
 }

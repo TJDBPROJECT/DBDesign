@@ -88,11 +88,11 @@
 
 
           <el-form-item label="回收时间" label-align="center" align="center">
-            <el-date-picker v-model="form.recycle_time" type="datetime" placeholder="选择日期时间"></el-date-picker>
+            <el-date-picker v-model="form.Recycle_Time" type="datetime" placeholder="选择日期时间"></el-date-picker>
           </el-form-item>
 
           <el-form-item label="回收地点" label-align="center" align="center">
-            <el-select v-model="form.recycle_location">
+            <el-select v-model="form.Recycle_Location">
               <el-option label="北京" value="北京" />
               <el-option label="上海" value="上海" />
               <el-option label="广东" value="广东" />
@@ -151,7 +151,7 @@
           // storage_capacity:'',
           // purchase_channel:'',          
         },
-        uploadedImages: ['http://110.42.220.245:8081/Image/iPhone6.jpg',],
+        uploadedImages: ['/public/p.jpg',],
         deviceInfo: null,
         imageList:[]
       };
@@ -231,7 +231,7 @@
               console.log(this.deviceInfo)
               // 将图片也更新
               this.productName = this.deviceInfo.DeviceType[0].Brand
-              this.form.device_type =  this.deviceInfo.DeviceType[0].Type_Name
+              this.form.Device_Type =  this.deviceInfo.DeviceType[0].Type_Name
               this.imageList = this.deviceInfo.DeviceType[0].Structure_Url
               this.productImage = this.imageList[1]
           })
@@ -242,8 +242,8 @@
       async goToPricePage() {
         try {
           // 构造要传递给PricePage的数据
-          this.form.expectedprice = this.calculatePrice();
-          console.log('计算得到的价格:',  this.form.expectedprice);
+          this.form.ExpectedPrice = this.calculatePrice();
+          console.log('计算得到的价格:',  this.form.ExpectedPrice);
           const dataToPass = {
             form: this.form,
             uploadedImages: this.uploadedImages,            

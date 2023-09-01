@@ -7,39 +7,35 @@ export function pictureget() {
   })
 }
 /*创建维修订单信息*/
-export function createRepairOrder(uid,data) {
+export const insertNavigationUpload = (formData) => {
+  const id = formData.get('id'); // 从 formData 中提取 'id'
+
   return request({
-    url: `http://110.42.220.245:8081/RepairOrder/${uid}`,
-    method: 'post',
-    data: {
-          CouponID: 'cou123',
-          EngineerID: 'eng001',
-          OptionID: 'opt123',
-          RepairLocation: '同济大学19号楼',
-          RepairTime: "2023-08-24T11:30:35",
-          OrderPrice: data.OrderPrice,
-          ProblemPart:"屏幕",
-          ProblemDetail:"屏幕碎裂",
-          Requirement:"换个屏幕",
-          Brand:"华为",
-    },
+    url: `http://110.42.220.245:8081/RepairOrder/${id}`,
+    method: 'POST',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
-}
+};
+
+
+
 /*获取维修订单信息*/
 export function repair_info(params) {
   return request({
-    url: `/api/RepairOrder/${params.uid}`,
+    url: `/api/RecycleOrder/${params.id}`,
     method: 'get',
     data: {
-        Username: params.username,
-        Telephone: params.telephone,
-        repairlocation: params.repairlacation,
-        type_name: params.type_name,
-        repairtime: params.repairtime,
-        repairrequirement: params.repairrequirement,
-        engineerid: params.engineerid,
-        engineername: params.engineername,
-        photo:"",
+      Username: params.username,
+      Telephone: params.telephone,
+      repairlocation: params.repairlacation,
+      type_name: params.type_name,
+      repairtime: params.repairtime,
+      repairrequirement: params.repairrequirement,
+      engineerid: params.engineerid,
+      engineername: params.engineername,
     }
   })
 }
+
+

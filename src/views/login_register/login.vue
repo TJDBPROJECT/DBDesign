@@ -96,15 +96,16 @@ export default {
         user: this.loginForm.userid,
         pass: this.loginForm.password,
       }
+ 
       console.log(params)
       login(params).then((res) => {
         console.log(res.data)
-        if (res.data.success == false || this.loginForm.code != this.loginForm.codeToken) {
+        if (res.data.success === false || this.loginForm.code.toUpperCase() != this.loginForm.codeToken.toUpperCase()) {
           this.$message("登录失败")
           this.resetForm();
         }
         else {
-          console.log("登录成功")
+          this.$message("登录成功")
           this.$router.push('/mainpage')
         }
       })

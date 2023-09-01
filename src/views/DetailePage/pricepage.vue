@@ -46,7 +46,6 @@
   <div class="total-amount">
     <span class="amount-label">总金额：</span>
     <span class="amount-value">{{ this.price }}元</span>
-    <el-button type="primary" @click="rechargeBalance">充钱</el-button>
     <el-button type="primary" @click="goback">返回</el-button>
     <el-button type="primary" @click="submitForm">支付</el-button>
   </div>
@@ -55,8 +54,7 @@
 <script>
 import { ref} from 'vue';
 import { ElTable, ElSteps, ElCountdown } from 'element-plus';
-import { createRepairOrder, repair_info } from "@/api/repairprice_info.js";
-import axios from 'axios';
+import {insertNavigationUpload, repair_info } from "@/api/repairprice_info.js";
 import { mapState} from 'vuex'
 
 export default {
@@ -96,31 +94,16 @@ export default {
         //imageUrl: imageUrl, 
         '服务类型（维修/回收）': '维修',
         下单用户名: parsedData.form.name,
-        物品名称:parsedData.form.deviceName,
-        约定的服务地点:parsedData.form.location,
+        物品名称:parsedData.form.Brand,
+        约定的服务地点:parsedData.form.RepairLocation,
         下单时间: parsedData.currentTime,
-        订单金额: parsedData.price,
+        订单金额: parsedData.OrderPrice,
         订单状态: '待支付', 
       });
     }
   },
   methods: {
-    /*为账户充钱的函数*/
-    async rechargeBalance() {
-    try {
-      const num = 500; 
-      const response = await axios.post(`http://110.42.220.245:8081/Balance/Charge/${this.uid}?num=${num}`);
-      
-      if (response.data.success) {
-        console.log('Recharge successful');
-        // You can update the user's balance in your component's data here
-      } else {
-        console.error('Recharge failed');
-      }
-    } catch (error) {
-      console.error('Error during recharge:', error);
-    }
-  },
+   
     async submitForm() {
       try {
          // 构造要传递给PayPage的数据
@@ -142,35 +125,43 @@ export default {
         console.error('Error navigating to PricePage:', error);
       }
       try {
-        const createdata = {
-          CouponID: 'cou123',
-          EngineerID: 'eng001',
-          OptionID: 'opt123',
-          RepairLocation: '同济大学19号楼',
-          RepairTime: "2023-08-24T11:30:35",
-          OrderPrice: 200,
-          ProblemPart:"屏幕",
-          ProblemDetail:"屏幕碎裂",
-          Requirement:"换个屏幕",
-          Brand:"华为",
-        };
+    // 创建回收订单信息
 
-        const createResponse = await createRepairOrder(this.uid,createdata);
-        
-        if (createResponse.data.success) {
-          console.log('维修订单创建成功:', createResponse.data);
-          this.$router.push({ name: 'paypage' });
-          const getOrderResponse = await repair_info(this.uid); 
+    // 将 this.id 传递给请求的 URL 中
+    const formData = new FormData();
+    const jsonStr = JSON.stringify(this.form);
+    formData.append('Json', jsonStr);
 
-          console.log('获取维修订单信息:', getOrderResponse.data);
+    // 创建虚拟的 File 对象，用于模拟上传的文件
+    const imageBlob = await fetch(this.imageUrl).then(response => response.blob());
+    const imageFile = new File([imageBlob], 'p.jpg', { type: 'image/jpeg' });
+    formData.append('file', this.imageUrl);
 
-          // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
-        } else {
-          console.error('维修订单创建失败:', createResponse.data);
-        }
-      } catch (error) {
-        console.error('Error creating order:', error);
-      }
+    formData.append('id', this.uid);
+
+    // 打印 this.form 部分
+    console.log("FormData 中的 this.form 部分:", this.form);
+
+    // 打印图片 File 对象
+    console.log("FormData 中的图片 File 对象:", imageFile);
+
+    // 发送上传请求
+    const createResponse = await insertNavigationUpload(formData);
+    console.log(createResponse.data);
+
+    if (createResponse.data.success) {
+      console.log('维修订单创建成功:', createResponse.data);
+      this.$router.push({ name: 'paypage' });
+      const getOrderResponse = await repair_info({ id: this.userId });
+      console.log('获取维修订单信息:', getOrderResponse.data);
+
+      // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
+    } else {
+      console.error('维修订单创建失败:', createResponse.data);
+    }
+  } catch (error) {
+    console.error('Error creating order:', error);
+  }
     },
     async goback() {
       try {

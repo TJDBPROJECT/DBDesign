@@ -15,7 +15,7 @@
                 </template>
                 <div>
                   <div>
-                    <el-button v-if="showButton" type="primary" style="margin-left: 95%;"
+                    <el-button v-if="showButton" type="primary" style="margin-left: 40%;"
                       @click="editMode = true; showButton = !showButton">修改</el-button>
                     <el-form :model="formData" label-width="120px" v-if="editMode">
                       <el-form-item label="姓名">

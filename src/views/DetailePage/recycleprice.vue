@@ -45,7 +45,7 @@
 
   <div class="total-amount">
     <span class="amount-label">预估回收价：</span>
-    <span class="amount-value">{{ this.form.expectedprice }}元</span>
+    <span class="amount-value">{{ this.form.ExpectedPrice }}元</span>
     <el-button type="primary" @click="goback">返回</el-button>
     <el-button type="primary" @click="submitForm">提交</el-button>
   </div>
@@ -95,10 +95,10 @@ export default {
         form: parsedData.form,
         '服务类型（维修/回收）': '回收',
         设备品牌: parsedData.form.deviceName,
-        设备型号:parsedData.form.device_type,
-        回收地点:parsedData.form.recycle_location,
+        设备型号:parsedData.form.Device_Type,
+        回收地点:parsedData.form.Recycle_Location,
         下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'), 
-        预期价格:parsedData.form.expectedprice, 
+        预期价格:parsedData.form.ExpectedPrice, 
       });
     }
   },
@@ -132,17 +132,16 @@ export default {
     formData.append('Json', jsonStr);
 
     // 创建虚拟的 File 对象，用于模拟上传的文件
-    const imageBlob = await fetch(this.imageUrl).then(response => response.blob());
-    const imageFile = new File([imageBlob], 'p.jpg', { type: 'image/jpeg' });
-    formData.append('file', imageFile);
+    // const imageBlob = await fetch(this.imageUrl).then(response => response.blob());
+    // const imageFile = new File([imageBlob], 'p.jpg', { type: 'image/jpeg' });
+    // formData.append('file', this.imageUrl);
 
     formData.append('id', this.id);
 
     // 打印 this.form 部分
     console.log("FormData 中的 this.form 部分:", this.form);
 
-    // 打印图片 File 对象
-    console.log("FormData 中的图片 File 对象:", imageFile);
+
 
     // 发送上传请求
     const createResponse = await insertNavigationUpload(formData);

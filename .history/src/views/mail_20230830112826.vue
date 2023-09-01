@@ -6,7 +6,11 @@
       <el-table-column prop="News_Title" label="标题"></el-table-column>
       <el-table-column prop="News_Date" label="日期"></el-table-column>
       <el-table-column prop="IsRead" label="是否已读"></el-table-column>
-
+      <el-table-column label="操作">
+        <template #default="scope">
+          <el-button type="text" @click="readMessage(scope.row.ID)">查看</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-dialog v-model:visible="dialogVisible">
       <h3>{{ currentMessage.News_Title }}</h3>
