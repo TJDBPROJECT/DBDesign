@@ -13,7 +13,13 @@ export const insertNavigationUpload = (formData) => {
   });
 };
 
-
+//删除回收订单
+export function deleteRecycleOrder(uid, id) {
+  return request({
+    url:`http://110.42.220.245:8081/RecycleOrder/${uid}/${id}`,
+    method:'delete',
+  });
+}
 
 /*获取回收订单信息*/
 export function recycle_info(params) {

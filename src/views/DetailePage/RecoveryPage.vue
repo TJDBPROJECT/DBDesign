@@ -81,9 +81,9 @@
             </el-form-item> -->
           
 
-            <!-- <el-form-item label="设备型号">
-              <el-input  class="input" v-model="form.device_type"></el-input>
-            </el-form-item> -->
+            <el-form-item label="用户地址">
+              <el-input  class="input" v-model="form.CustomerLocation"></el-input>
+            </el-form-item>
 
 
 
@@ -100,13 +100,20 @@
             </el-select>
           </el-form-item>
         </el-form>
+        <!-- 修改部分 -->
         <el-upload
         class="upload-demo"
+        ref="uploadImage"
         drag
-        action="/api/CateImage" 
         multiple
+        accept="image/jpeg,image/png,image/jpg"
+        :file-list="fileList"
+        :on-change="fileChange"
+        :limit="3"
         :on-success="handleUploadSuccess"
+        :auto-upload="false"
       >
+      <!-- 修改部分结束 -->
       <h1>点击上传回收设备的图片，内存小于500KB</h1>
         <!-- ... Your upload icon and text ... -->
       </el-upload>
@@ -121,7 +128,8 @@
   import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
   import axios from 'axios';
-  
+  import {insertNavigationUpload} from "@/api/recycle_info.js";
+  import { mapState} from 'vuex';
   export default {
 
     name:'RecoveryPage',
@@ -136,6 +144,9 @@
         required: true
       }
     },
+    computed: {
+    ...mapState(['userid']), // Map the 'userid' state from Vuex to a local property
+    },
     data() {
       return {
         productImage: require('/public/p.jpg'),
@@ -145,15 +156,21 @@
           Device_Cate: 'phone',
           Device_Type: '',
           // deviceName: '',
-          ExpectedPrice: '',
+          ExpectedPrice: 0,
+          CustomerLocation:'shanghai',
           Recycle_Location: '',
           Recycle_Time: '',
           // storage_capacity:'',
           // purchase_channel:'',          
         },
-        uploadedImages: ['/public/p.jpg',],
+        uploadedImages: ['http://110.42.220.245:8081/Image/iPhone6.jpg',],
         deviceInfo: null,
-        imageList:[]
+        imageList:[],
+        /*新增变量*/
+        fileArr:[],
+        fileList:[],
+        id:null,
+        orderId:null,
       };
     },
     components: {
@@ -244,34 +261,70 @@
           // 构造要传递给PricePage的数据
           this.form.ExpectedPrice = this.calculatePrice();
           console.log('计算得到的价格:',  this.form.ExpectedPrice);
+          await this.submitForm();
           const dataToPass = {
             form: this.form,
-            uploadedImages: this.uploadedImages,            
+            uploadedImage:this.$refs.uploadedImage,            
             productId:this.productId,
+            orderId:this.orderId,
           };
-          console.log("传递的数据", dataToPass);
+          
           // 使用query参数传递数据，而不是params
           this.$router.push({
             name: 'recycleprice',
-            query: {
+            query:{
               data: JSON.stringify(dataToPass),
-            },
-          
+            }
           });
           
         } catch (error) {
           console.error('Error navigating to PricePage:', error);
         }
       },
+      /*新增方法*/ 
+      async submitForm()
+      {
+        try{
+          this.form.ExpectedPrice = this.calculatePrice();
+          const dataToPass = new FormData();
+          this.id =this.userid
+          dataToPass.append('id', this.id);
+          console.log("正在创建回收订单",this.id)
+          dataToPass.append("Json",JSON.stringify(this.form));
+          console.log("FormData 中的 this.form 部分:", this.form);
+          for(var i=0;i<this.fileArr.length;i++)
+          {
+           dataToPass.append("file",this.fileArr[i]);
+          }
+          const createResponse = await insertNavigationUpload(dataToPass);
+          console.log(createResponse.data);
+  
+          if (createResponse.data.success) {
+            console.log('回收订单创建成功:', createResponse.data);
+             // 获取返回的orderid并存储在页面数据中
+              const orderId = createResponse.data.orderid; // 假设返回的字段名是orderid
+              this.orderId = orderId;
+              console.log("获取订单id",this.orderId)
+          } 
+          else {
+            console.error('回收订单创建失败:', createResponse.data);
+          }
+        }
+        catch (error) {
+        console.error('Error creating order:', error);
+        } 
+      },
+      fileChange(file)
+      {
+        this.fileArr.push(file.raw);
+      }
     },
+    
     handleOptionSelected(option) {
         console.log('选中的存储容量:', option);
         // 在这里处理选中的存储容量
         this.form.storage_capacity = option;
     },
-      
-   
-   
   };
   </script>
   

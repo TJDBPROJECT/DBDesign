@@ -37,10 +37,11 @@
         <div><strong>品 牌 详 情:</strong> {{ selectedOrder.Device.Device_Type_ID.Type_Name }}</div>
         <div><strong>回 收 时 间:</strong> {{ selectedOrder.Recycle_Time }}</div>
       </div>
+
       <div class="details-right-column">
         <div>
           <strong>图 片：</strong>
-          <div v-for="imageUrl in selectedOrder.Device.Device_Type_ID.Structure_Url" :key="imageUrl">
+          <div v-for="imageUrl in selectedOrder.Images" :key="imageUrl">
             <img :src="imageUrl" alt="图片"
               style="max-width: 100px; max-height: 100px; margin-right: 10px; cursor: pointer;"
               @click="openImageModal(imageUrl)">
@@ -166,6 +167,7 @@ export default {
     openImageModal(imageUrl) {
       this.selectedImage = imageUrl;
       this.isImageModalVisible = true;
+      console.log(imageUrl);
     },
 
     closeImageModal() {

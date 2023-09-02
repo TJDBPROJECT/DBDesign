@@ -1,17 +1,20 @@
 import request from '@/utils/request'
 
+
 /*创建回收订单信息*/
-export const insertNavigationUpload = (formData) => {
-  const id = formData.get('id'); // 从 formData 中提取 'id'
-
+export function createRecycleOrder() {
   return request({
-    url: `http://110.42.220.245:8081/RecycleOrder/${id}`,
-    method: 'POST',
-    data: formData,
-    headers: { 'Content-Type': 'multipart/form-data' },
+    url: `http://110.42.220.245:8081/RecycleOrder/{id}`,
+    method: 'post',
+    data: {
+      Device_Cate:"phone",
+      Device_Type:"iPhone6",
+      ExpectedPrice:100,
+      Recycle_Location:"home",
+      Recycle_Time:"2023-08-10T15:25:00"
+    },
   });
-};
-
+}
 /*获取回收订单信息*/
 export function recycle_info(params) {
   return request({

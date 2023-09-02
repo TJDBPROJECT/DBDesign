@@ -36,16 +36,22 @@
         <div><strong>优 惠 类 型:</strong> {{ selectedOrder.CouObj.Name }}</div>
         <div><strong>是 否 使 用:</strong> {{ selectedOrder.CouObj.Status }}</div>
         <div><strong>优 惠 编 号:</strong> {{ selectedOrder.CouObj.Type }}</div>
+        <div><strong>维 修 品 牌:</strong> {{ selectedOrder.RepairOptionID.Brand }}</div>
+        <div><strong>维 修 详 情:</strong> {{ selectedOrder.RepairOptionID.RepairCategory.Detail }}</div>
         <!-- 其他左侧内容 -->
       </div>
       <div class="details-right-column">
         <!-- 右侧内容 -->
-        <div><strong>维 修 品 牌:</strong> {{ selectedOrder.RepairOptionID.Brand }}</div>
-        <div><strong>维 修 详 情:</strong> {{ selectedOrder.RepairOptionID.RepairCategory.Detail }}</div>
         <div><strong>维 修 I D:</strong> {{ selectedOrder.RepairOptionID.RepairCategory.ID }}</div>
         <div><strong>维 修 设 备:</strong> {{ selectedOrder.RepairOptionID.RepairCategory.Name }}</div>
         <div><strong>维 修 需 求:</strong> {{ selectedOrder.RepairOptionID.RepairRequirement }}</div>
         <div><strong>维 修 时 间:</strong> {{ selectedOrder.RepairTime }}</div>
+        <strong>图 片：</strong>
+          <div v-for="imageUrl in selectedOrder.Images" :key="imageUrl">
+            <img :src="imageUrl" alt="图片"
+              style="max-width: 100px; max-height: 100px; margin-right: 10px; cursor: pointer;"
+              @click="openImageModal(imageUrl)">
+          </div>
         <!-- 其他右侧内容 -->
       </div>
     </div>
@@ -70,6 +76,13 @@
         <el-button @click="handleDeleteDialogClose">取消</el-button>
       </span>
     </template>
+  </el-dialog>
+
+    <!-- 放大图片的弹窗 -->
+    <el-dialog v-model="isImageModalVisible" title="放大图片">
+    <div v-if="selectedImage">
+      <img :src="selectedImage" alt="放大图片" style="max-width: 100%; max-height: 100%;" />
+    </div>
   </el-dialog>
 </template>
 
@@ -134,6 +147,17 @@ export default {
     openDetailsDialog(row) {
       this.selectedOrder = row;
       this.detailsDialogVisible = true;
+    },
+
+    openImageModal(imageUrl) {
+      this.selectedImage = imageUrl;
+      this.isImageModalVisible = true;
+      console.log(imageUrl);
+    },
+
+    closeImageModal() {
+      this.isImageModalVisible = false;
+      this.selectedImage = ''; // 清空选中的图片
     },
     // 更新当前页面显示的数据
     updateDisplayedRepairData() {

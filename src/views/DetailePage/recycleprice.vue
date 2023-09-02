@@ -52,11 +52,11 @@
 </template>
 
 <script>
-import { ref} from 'vue';
+import { ref } from 'vue';
 import { ElTable, ElSteps, ElCountdown } from 'element-plus';
-import { recycle_info, insertNavigationUpload} from "@/api/recycleprice_info.js";
+import { deleteRecycleOrder } from "@/api/recycleprice_info.js";
 import dayjs from 'dayjs';
-import { mapState} from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'PricePage',
@@ -66,7 +66,7 @@ export default {
     ElCountdown,
   },
   computed: {
-    ...mapState(['userid']), // Map the 'userid' state from Vuex to a local property
+    ...mapState(['userid']),
   },
   data() {
     return {
@@ -75,113 +75,103 @@ export default {
       value: Date.now() + 1000 * 60 * 60 * 7,
       value1: Date.now() + 1000 * 60 * 60 * 24 * 2,
       value2: dayjs().add(1, 'month').startOf('month'),
-      id:null,
-      imageUrl:require('/public/p.jpg'),
+      id: null,
+      orderId: null,
+      imageUrl: require('/public/p.jpg'),
     };
   },
-  created() {
-    const passedData = this.$route.query.data;
-    console.log("接受的数据", passedData);
-    if (passedData) {
-      const parsedData = JSON.parse(passedData);
-      this.form = parsedData.form;
-      
-      this.uploadedImages = parsedData.uploadedImages;
-      this.productId=parsedData.productId;
-      // 添加传递的信息到表格数据中
-      this.id =this.userid
-      console.log(this.id);
-      this.tableData.push({
-        form: parsedData.form,
-        '服务类型（维修/回收）': '回收',
-        设备品牌: parsedData.form.deviceName,
-        设备型号:parsedData.form.Device_Type,
-        回收地点:parsedData.form.Recycle_Location,
-        下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'), 
-        预期价格:parsedData.form.ExpectedPrice, 
-      });
+  async created() {
+    try {
+      const passedData = this.$route.query.data;
+      console.log("接受的数据", passedData);
+
+      if (passedData) {
+        const parsedData = JSON.parse(passedData);
+        this.form = parsedData.form;
+        this.uploadedImages = parsedData.uploadedImages;
+        this.productId = parsedData.productId;
+        this.orderId = parsedData.orderId;
+
+        // 现在orderId已经被赋值，你可以安全地访问它。
+        console.log("order", this.orderId);
+        console.log("form", this.form);
+
+        // 添加传递的信息到表格数据中
+        this.id = this.userid;
+        console.log(this.id);
+        this.tableData.push({
+          form: parsedData.form,
+          '服务类型（维修/回收）': '回收',
+          设备品牌: parsedData.form.deviceName,
+          设备型号: parsedData.form.Device_Type,
+          回收地点: parsedData.form.Recycle_Location,
+          下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          预期价格: parsedData.form.ExpectedPrice,
+        });
+      }
+    } catch (error) {
+      console.error('在created钩子中发生错误：', error);
     }
   },
   methods: {
     async submitForm() {
-  try {
-    // 构造要传递给 PayPage 的数据
-    const dataToPass = {
-      productId: this.productId,
-    };
-    console.log("传递的数据", dataToPass);
+      try {
+        // 构造要传递给 PayPage 的数据
+        const dataToPass = {
+          productId: this.productId,
+        };
+        console.log("传递的数据", dataToPass);
 
-    // 使用 query 参数传递数据，而不是 params
-    this.$router.push({
-      name: 'paypage',
-      query: {
-        data: JSON.stringify(dataToPass),
-        productId: this.productId,
-      },
-    });
-  } catch (error) {
-    console.error('Error navigating to PricePage:', error);
-  }
-
-  try {
-    // 创建回收订单信息
-
-    // 将 this.id 传递给请求的 URL 中
-    const formData = new FormData();
-    const jsonStr = JSON.stringify(this.form);
-    formData.append('Json', jsonStr);
-
-    // 创建虚拟的 File 对象，用于模拟上传的文件
-    // const imageBlob = await fetch(this.imageUrl).then(response => response.blob());
-    // const imageFile = new File([imageBlob], 'p.jpg', { type: 'image/jpeg' });
-    // formData.append('file', this.imageUrl);
-
-    formData.append('id', this.id);
-
-    // 打印 this.form 部分
-    console.log("FormData 中的 this.form 部分:", this.form);
-
-
-
-    // 发送上传请求
-    const createResponse = await insertNavigationUpload(formData);
-    console.log(createResponse.data);
-
-    if (createResponse.data.success) {
-      console.log('回收订单创建成功:', createResponse.data);
-      this.$router.push({ name: 'paypage' });
-      const getOrderResponse = await recycle_info({ id: this.userId });
-      console.log('获取回收订单信息:', getOrderResponse.data);
-
-      // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
-    } else {
-      console.error('回收订单创建失败:', createResponse.data);
-    }
-  } catch (error) {
-    console.error('Error creating order:', error);
-  }
-},
-
-
+        // 使用 query 参数传递数据，而不是 params
+        this.$router.push({
+          name: 'paypage',
+          query: {
+            data: JSON.stringify(dataToPass),
+            productId: this.productId,
+          },
+        });
+      } catch (error) {
+        console.error('Error navigating to PricePage:', error);
+      }
+    },
 
     async goback() {
       try {
-         // 构造要传递给repairpage的数据
+        await this.deleteOrder(this.id, this.orderId);
+
         const dataToPass = {
-          productId:this.productId,
+          productId: this.productId,
         };
         console.log("传递的数据", dataToPass);
-         // 使用query参数传递数据，而不是params
-         this.$router.push({
+
+        // 使用query参数传递数据，而不是params
+        this.$router.push({
           name: 'RecoveryPage',
           query: {
             data: JSON.stringify(dataToPass),
           },
-         
         });
-        
+
       } catch (error) {
         console.error('Error navigating to repairpage:', error);
+      }
+    },
+
+    async deleteOrder(uid, id) {
+      try {
+        console.log("用户", uid)
+        console.log("订单", id)
+        const response = await deleteRecycleOrder(uid, id);
+        if (response.success) {
+          // 订单删除成功，执行你的成功处理逻辑
+          console.log('订单删除成功',response);
+        } else {
+          // 订单删除失败，执行你的失败处理逻辑
+          console.error('订单删除失败',response);
+        }
+      } catch (error) {
+        // 处理请求错误
+        console.error('Error deleting order:', error);
       }
     },
   },
