@@ -55,8 +55,9 @@
 import { ref } from 'vue';
 import { ElTable, ElSteps, ElCountdown } from 'element-plus';
 import { deleteRecycleOrder } from "@/api/recycleprice_info.js";
-import dayjs from 'dayjs';
 import { mapState } from 'vuex';
+import dayjs from 'dayjs';
+import axios from 'axios';
 
 export default {
   name: 'PricePage',
@@ -77,6 +78,7 @@ export default {
       value2: dayjs().add(1, 'month').startOf('month'),
       id: null,
       orderId: null,
+      price: null,
       imageUrl: require('/public/p.jpg'),
     };
   },
@@ -133,6 +135,20 @@ export default {
       } catch (error) {
         console.error('Error navigating to PricePage:', error);
       }
+      try {
+        const uid = this.id; 
+        const num = this.price; 
+        const response = await axios.post(`http://110.42.220.245:8081/Balance/Income/{uid}?num={num}`);
+        
+        if (response.data.success) {
+          console.log('Recharge successful');
+        } else {
+          console.error('Recharge failed');
+        }
+      } catch (error) {
+        console.error('Error during recharge:', error);
+      }
+      
     },
 
     async goback() {

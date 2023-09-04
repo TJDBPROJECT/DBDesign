@@ -14,3 +14,15 @@ export function getEngineer(params) {
       }
   });
 }
+
+//获取地址信息
+export function getLocationInfo(UserID) {
+  return request({
+    url: "/ServiceLoc/"+ UserID,
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
+

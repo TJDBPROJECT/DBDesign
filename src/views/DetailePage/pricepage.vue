@@ -13,11 +13,6 @@
 
     <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
       <el-table-column type="selection" width="55" />
-      <el-table-column label="图片信息" width="180">
-        <template #default="{ row }">
-          <img :src="row.imageUrl" alt="图片" style="width: 100px; height: 100px;" />
-        </template>
-      </el-table-column>
       <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
       
       <el-table-column property="下单时间" label="下单时间" width="180"></el-table-column>
@@ -54,7 +49,7 @@
 <script>
 import { ref} from 'vue';
 import { ElTable, ElSteps, ElCountdown } from 'element-plus';
-import {insertNavigationUpload, repair_info } from "@/api/repairprice_info.js";
+import { deleteRepairOrder } from "@/api/repairprice_info.js";
 import { mapState} from 'vuex'
 
 export default {
@@ -72,7 +67,8 @@ export default {
       multipleTableRef: ref(null),
       tableData: ref([]),
       currentTime: null,
-      uid:null,
+      id: null,//用户id
+      orderId: null,
     };
   },
   created() {
@@ -85,13 +81,14 @@ export default {
       this.uploadedImages = parsedData.uploadedImages;
       this.productId=parsedData.productId;
       this.currentTime = parsedData.currentTime;
-      this.uid =this.userid;
-      console.log("接受的数据", this.uid);
+      this.orderId = parsedData.orderId;
+      this.id =this.userid; 
+      console.log("接受的数据", this.id);
+      console.log("接受的数据", this.orderId);
       //const imageUrl = 'https://example.com/path/to/your/image.jpg';/*订单中所展示出来的图片*/ 
       // 添加传递的信息到表格数据中
       this.tableData.push({
         form: parsedData.form,
-        //imageUrl: imageUrl, 
         '服务类型（维修/回收）': '维修',
         下单用户名: parsedData.form.name,
         物品名称:parsedData.form.Brand,
@@ -103,7 +100,6 @@ export default {
     }
   },
   methods: {
-   
     async submitForm() {
       try {
          // 构造要传递给PayPage的数据
@@ -124,47 +120,11 @@ export default {
       } catch (error) {
         console.error('Error navigating to PricePage:', error);
       }
-      try {
-    // 创建回收订单信息
-
-    // 将 this.id 传递给请求的 URL 中
-    const formData = new FormData();
-    const jsonStr = JSON.stringify(this.form);
-    formData.append('Json', jsonStr);
-
-    // 创建虚拟的 File 对象，用于模拟上传的文件
-    const imageBlob = await fetch(this.imageUrl).then(response => response.blob());
-    const imageFile = new File([imageBlob], 'p.jpg', { type: 'image/jpeg' });
-    formData.append('file', this.imageUrl);
-
-    formData.append('id', this.uid);
-
-    // 打印 this.form 部分
-    console.log("FormData 中的 this.form 部分:", this.form);
-
-    // 打印图片 File 对象
-    console.log("FormData 中的图片 File 对象:", imageFile);
-
-    // 发送上传请求
-    const createResponse = await insertNavigationUpload(formData);
-    console.log(createResponse.data);
-
-    if (createResponse.data.success) {
-      console.log('维修订单创建成功:', createResponse.data);
-      this.$router.push({ name: 'paypage' });
-      const getOrderResponse = await repair_info({ id: this.userId });
-      console.log('获取维修订单信息:', getOrderResponse.data);
-
-      // 在此处您可以进行订单创建成功后的后续操作，例如跳转到订单详情页等
-    } else {
-      console.error('维修订单创建失败:', createResponse.data);
-    }
-  } catch (error) {
-    console.error('Error creating order:', error);
-  }
+      
     },
     async goback() {
       try {
+        await this.deleteOrder(this.id, this.orderId);
          // 构造要传递给repairpage的数据
         const dataToPass = {
           productId:this.productId,
@@ -181,6 +141,23 @@ export default {
         
       } catch (error) {
         console.error('Error navigating to repairpage:', error);
+      }
+    },
+    async deleteOrder(uid, id) {
+      try {
+        console.log("用户", uid)
+        console.log("订单", id)
+        const response = await deleteRepairOrder(uid, id);
+        if (response.success) {
+          // 订单删除成功，执行你的成功处理逻辑
+          console.log('订单删除成功',response);
+        } else {
+          // 订单删除失败，执行你的失败处理逻辑
+          console.error('订单删除失败',response);
+        }
+      } catch (error) {
+        // 处理请求错误
+        console.error('Error deleting order:', error);
       }
     },
   },

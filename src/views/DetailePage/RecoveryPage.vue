@@ -57,7 +57,7 @@
         
         <el-form ref="productForm" :model="form" label-width="120px">
           <el-form-item label="存储容量">
-            <DropdownList :options="['64G', '128G', '256G']" v-model="form.storage_capacity"></DropdownList>
+            <DropdownList :options="['64G', '128G', '256G','无']" v-model="form.storage_capacity"></DropdownList>
           </el-form-item>
 
           <el-form-item label="购买渠道">
@@ -160,8 +160,8 @@
           CustomerLocation:'shanghai',
           Recycle_Location: '',
           Recycle_Time: '',
-          // storage_capacity:'',
-          // purchase_channel:'',          
+          storage_capacity:'',
+          purchase_channel:'',          
         },
         uploadedImages: ['http://110.42.220.245:8081/Image/iPhone6.jpg',],
         deviceInfo: null,

@@ -49,14 +49,22 @@
               <el-descriptions-item label="联系电话" label-align="center" align="center" background-color=" blue">
                 <el-input v-model="this.phone"></el-input>
               </el-descriptions-item>
-              <el-descriptions-item label="维修服务地点" label-align="center" align="center">
-                  <el-select v-model="form.RepairLocation">
-                  <el-option label="北京" value="北京" />
-                  <el-option label="上海" value="上海" />
-                  <el-option label="广东" value="广东" />
-                  <!-- 添加其他地点选项 -->
-               </el-select>
+              <el-descriptions-item label="居住地址" label-align="center" align="center" background-color=" blue">
+                <el-input v-model="this.form.CustomerLocation"></el-input>
               </el-descriptions-item>
+              <el-descriptions-item label="维修服务地点" label-align="center" align="center">
+                <el-select v-model="form.RepairLocation">
+                  <el-option
+                  v-for="location in locationInfo"
+                  :key="location.ID"
+                  :label="location.Location_Name"
+                  :value="`${location.Location_Name} ${location.Loc_Detail}`"
+                  />
+                </el-select>
+
+              </el-descriptions-item>
+
+
               <el-descriptions-item label="设备名称" label-align="center" align="center">
                 <el-select v-model="form.Brand">
                   <el-option label="iphone" value="iphone" />
@@ -163,9 +171,14 @@
 <script>
 //import { getEngineer } from '@/api/repair_info.js';
 import axios from 'axios';
-
+import { mapState} from 'vuex';
+import {insertNavigationUpload} from "@/api/repairprice_info.js";
+import {getLocationInfo} from "@/api/repair_info.js";
 export default {
   name: 'RepairPage',
+  computed: {
+    ...mapState(['userid']), // Map the 'userid' state from Vuex to a local property
+  },
   data() {
     return {
       form: {
@@ -181,6 +194,7 @@ export default {
         RepairTime:'',
         isWarranty:'',
         uploadedImages: [], // Store uploaded image URLs
+        CustomerLocation:'',
       },
       productId:null,
       name:'',
@@ -188,7 +202,12 @@ export default {
       showPopoverContent: false,
       selectedEngineer: null, // Initialize selectedEngineer
       engineersData: [], // Store the retrieved engineer data
-      
+      /*新增变量*/
+      fileArr:[],
+      fileList:[],
+      id:null,
+      orderId:null,
+      locationInfo: null,
       // engineersData: [
       //   { value: "engineerA", name: "小盛", sex: "男", rating: 4.1, experience: "5年" },
       //   { value: "engineerB", name: "老默", sex: "男", rating: 4.9, experience: "3年" },
@@ -196,11 +215,22 @@ export default {
       // ],
     };
   },
+  
     mounted() {
     // 接收上一个组件的值，并将其赋给data.product.productId
       this.productId = this.$route.params.productId;
       console.log("接收的 productId:", this.$route.params.productId);
       this.fetchEngineersData(); // 在组件挂载时获取工程师数据
+    },
+    created() {
+      this.getLocationData()
+      .then(() => {
+        console.log("获取地址信息成功");
+      })
+      .catch((error) => {
+        console.log("获取地址信息失败");
+        console.error('Error:', error);
+      });
     },
 
   /*created() {
@@ -248,6 +278,7 @@ export default {
       this.$router.push({ name: 'CenterPage', params: { productId: this.productId } });
       // this.$router.push({ name: 'CenterPage', params: { productId: this.product.productId } });
     },
+    
     /*专门用来估算设备价格的函数*/ 
     calculatePrice() {
       let basePrice = 100; // 设置基础价格
@@ -316,9 +347,22 @@ export default {
       console.error('获取工程师数据失败:', error);
     }
   },
-
-
-
+  // 获取地址信息
+  getLocationData() {
+      return getLocationInfo(this.userid)
+        .then((res) => {
+          // 处理返回的数据
+          this.totalOrders = res.data.Location.length;
+          this.locationInfo = res.data.Location;
+          console.log("正在获取")
+          console.log(this.locationInfo)
+          console.log(this.totalOrders)
+        })
+        .catch((error) => {
+          // 处理错误
+          console.error('获取地址信息失败:', error);
+        });
+    },
     showSiteDetails() {
       // Implement the functionality for the "维修站点详情" button
       // For example, you can redirect to a new page or show a modal with site details
@@ -350,14 +394,17 @@ export default {
          console.log('计算得到的价格:', price);
          this.form.OrderPrice=price;
          const currentTime = new Date();
-         const formattedTime = currentTime.toISOString().slice(0, 19); // 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
+         const eightHoursLater = new Date(currentTime.getTime() + 8 * 60 * 60 * 1000); // 8小时的毫秒数
+         const formattedTime = eightHoursLater.toISOString().slice(0, 19);// 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
          console.log('下单时间:', formattedTime);
+         await this.submitForm();
          const dataToPass = {
           form: this.form,
           uploadedImages: this.uploadedImages,
           price: price, // 将计算得到的价格传递给PricePage
           currentTime: formattedTime, // 下单的本地时间
           productId:this.productId,
+          orderId:this.orderId,
         };
         console.log("传递的数据", dataToPass);
          // 使用query参数传递数据，而不是params
@@ -373,6 +420,42 @@ export default {
         console.error('Error navigating to PricePage:', error);
       }
     },
+    async submitForm()
+      {
+        try{
+          this.form.ExpectedPrice = this.calculatePrice();
+          const dataToPass = new FormData();
+          this.id =this.userid
+          dataToPass.append('id', this.id);
+          console.log("正在创建回收订单",this.id)
+          dataToPass.append("Json",JSON.stringify(this.form));
+          console.log("FormData 中的 this.form 部分:", this.form);
+          for(var i=0;i<this.form.uploadedImages.length;i++)
+          {
+           dataToPass.append("file",this.form.uploadedImages[i]);
+          }
+          const createResponse = await insertNavigationUpload(dataToPass);
+          console.log(createResponse.data);
+  
+          if (createResponse.data.success) {
+            console.log('维修订单创建成功:', createResponse.data);
+             // 获取返回的orderid并存储在页面数据中
+              const orderId = createResponse.data.orderid; // 假设返回的字段名是orderid
+              this.orderId = orderId;
+              console.log("获取订单id",this.orderId)
+          } 
+          else {
+            console.error('维修订单创建失败:', createResponse.data);
+          }
+        }
+        catch (error) {
+        console.error('Error creating order:', error);
+        } 
+      },
+      fileChange(file)
+      {
+        this.form.uploadedImages.push(file.raw);
+      },
     // go_center() {
     //   this.$router.push({ name: 'CenterPage' });
 
