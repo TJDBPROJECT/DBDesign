@@ -64,59 +64,39 @@
             <DropdownList :options="['自营门店', '官方门店', '网络门店']" v-model="form.purchase_channel"></DropdownList>
           </el-form-item>
 
-          <!-- <el-form-item label="设备品牌" label-align="left" align="center">
-              <el-select v-model="form.deviceName">
-                <el-option label="iphone" value="iphone" />
-                <el-option label="华为" value="华为" />
-                <el-option label="小米" value="小米" />
-                <el-option label="三星" value="三星" />
-                <el-option label="oppo" value="oppo" />
-                <el-option label="vivo" value="vivo" />
-                <el-option label="联想" value="联想" />
-                <el-option label="索尼" value="索尼" />
-                <el-option label="戴尔" value="戴尔" />
-                <el-option label="任天堂" value="任天堂" />
-                
-              </el-select>
-            </el-form-item> -->
-          
-
-            <el-form-item label="用户地址">
-              <el-input  class="input" v-model="form.CustomerLocation"></el-input>
-            </el-form-item>
-
-
-
           <el-form-item label="回收时间" label-align="center" align="center">
             <el-date-picker v-model="form.Recycle_Time" type="datetime" placeholder="选择日期时间"></el-date-picker>
           </el-form-item>
 
           <el-form-item label="回收地点" label-align="center" align="center">
-            <el-select v-model="form.Recycle_Location">
-              <el-option label="北京" value="北京" />
-              <el-option label="上海" value="上海" />
-              <el-option label="广东" value="广东" />
-              <!-- 添加其他地点选项 -->
-            </el-select>
-          </el-form-item>
+  <el-select v-model="form.Recycle_Location">
+    <el-option
+      v-for="location in locationInfo"
+      :key="location.ID"
+      :label="location.Location_Name"
+      :value="`${location.Location_Name} ${location.Loc_Detail}`"
+    />
+  </el-select>
+</el-form-item>
+
         </el-form>
         <!-- 修改部分 -->
-        <el-upload
-        class="upload-demo"
-        ref="uploadImage"
-        drag
-        multiple
-        accept="image/jpeg,image/png,image/jpg"
-        :file-list="fileList"
-        :on-change="fileChange"
-        :limit="3"
-        :on-success="handleUploadSuccess"
-        :auto-upload="false"
-      >
-      <!-- 修改部分结束 -->
-      <h1>点击上传回收设备的图片，内存小于500KB</h1>
-        <!-- ... Your upload icon and text ... -->
-      </el-upload>
+          <el-upload
+          class="upload-demo"
+          ref="uploadImage"
+          drag
+          multiple
+          accept="image/jpeg,image/png,image/jpg"
+          :file-list="fileList"
+          :on-change="fileChange"
+          :limit="3"
+          :on-success="handleUploadSuccess"
+          :auto-upload="false"
+          >
+          <!-- 修改部分结束 -->
+          <h1>点击上传回收设备的图片，内存小于500KB</h1>
+            <!-- ... Your upload icon and text ... -->
+          </el-upload>
       </div>
     </div>
   </div>
@@ -128,7 +108,7 @@
   import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
   import axios from 'axios';
-  import {insertNavigationUpload} from "@/api/recycle_info.js";
+  import {insertNavigationUpload,getLocationInfo} from "@/api/recycle_info.js";
   import { mapState} from 'vuex';
   export default {
 
@@ -165,6 +145,7 @@
         },
         uploadedImages: ['http://110.42.220.245:8081/Image/iPhone6.jpg',],
         deviceInfo: null,
+        locationInfo: null,
         imageList:[],
         /*新增变量*/
         fileArr:[],
@@ -181,11 +162,21 @@
     mounted() {
     // 接收上一个组件的值，并将其赋给data.product.productId
       this.productId = this.$route.params.productId;
+      this.id = this.userid;
+      console.log("接收的 Id:", this.id);
       console.log("接收的 productId:", this.$route.params.productId);
     },
     created() {
       this.getTypename();
       this.fetchDeviceInfo();
+      this.getLocationData()
+      .then(() => {
+        console.log("获取地址信息成功");
+      })
+      .catch((error) => {
+        console.log("获取地址信息失败");
+        console.error('Error:', error);
+      });
     },
     methods: {
       calculatePrice() {
@@ -240,10 +231,26 @@
       getTypename(){
         this.productId = this.$route.params.productId;
       },
+      // 获取地址信息
+      getLocationData() {
+      return getLocationInfo(this.userid)
+        .then((res) => {
+          // 处理返回的数据
+          this.totalOrders = res.data.Location.length;
+          this.locationInfo = res.data.Location;
+          console.log("正在获取")
+          console.log(this.locationInfo)
+          console.log(this.totalOrders)
+        })
+        .catch((error) => {
+          // 处理错误
+          console.error('获取地址信息失败:', error);
+        });
+    },
       fetchDeviceInfo() {
         axios.get(`http://110.42.220.245:8081/DeviceType/${this.productId}`)
           .then(response => {
-              console.log("到了1")
+              
               this.deviceInfo = response.data;
               console.log(this.deviceInfo)
               // 将图片也更新

@@ -138,7 +138,7 @@ export default {
       try {
         const uid = this.id; 
         const num = this.price; 
-        const response = await axios.post(`http://110.42.220.245:8081/Balance/Income/{uid}?num={num}`);
+        const response = await axios.post(`http://110.42.220.245:8081/Balance/Income/${uid}?num=${num}`);
         
         if (response.data.success) {
           console.log('Recharge successful');
