@@ -10,16 +10,30 @@
 
      
       <el-container>
-    <!-- 左侧图片区域 -->
     <!-- 左侧图片上传区域 -->
     <el-aside class="aside-center">
       <div class="upload-container upload-container-large">
-        <input type="file" @change="handleFileChange" />
+        <!--input type="file" @change="handleFileChange" /-->
+        <el-upload
+        class="upload-demo"
+        ref="uploadImage"
+        drag
+        multiple
+        accept="image/jpeg,image/png,image/jpg"
+        :file-list="fileList"
+        :on-change="handleFileChange"
+        :on-remove="handleFileRemove"
+        :limit="3"
+        :on-success="handleUploadSuccess"
+        :auto-upload="false"
+      >
+    <h1>请上传维修图片 大小不超过500K</h1>
+    </el-upload>
       </div>
-      <!-- 图片预览走马灯 -->
+      <!-- 图片预览走马灯(已修改) -->
     <div class="carousel-container">
       <el-carousel :interval="5000" arrow="always">
-        <el-carousel-item v-for="(image, index) in form.uploadedImages" :key="index">
+        <el-carousel-item v-for="(image, index) in this.imageArr" :key="index">
           <img :src="image" :alt="'Uploaded Image ' + index" style="width: 100%;" />
         </el-carousel-item>
       </el-carousel>
@@ -50,10 +64,7 @@
                 <el-input v-model="this.phone"></el-input>
               </el-descriptions-item>
               <el-descriptions-item label="居住地址" label-align="center" align="center" background-color=" blue">
-                <el-input v-model="this.form.CustomerLocation"></el-input>
-              </el-descriptions-item>
-              <el-descriptions-item label="维修服务地点" label-align="center" align="center">
-                <el-select v-model="form.RepairLocation">
+                <el-select v-model="form.CustomerLocation">
                   <el-option
                   v-for="location in locationInfo"
                   :key="location.ID"
@@ -61,7 +72,14 @@
                   :value="`${location.Location_Name} ${location.Loc_Detail}`"
                   />
                 </el-select>
-
+              </el-descriptions-item>
+               <el-descriptions-item label="维修服务地点" label-align="center" align="center">
+                  <el-select v-model="form.RepairLocation">
+                  <el-option label="北京" value="北京" />
+                  <el-option label="上海" value="上海" />
+                  <el-option label="广东" value="广东" />
+                  <!-- 添加其他地点选项 -->
+               </el-select>
               </el-descriptions-item>
 
 
@@ -203,8 +221,8 @@ export default {
       selectedEngineer: null, // Initialize selectedEngineer
       engineersData: [], // Store the retrieved engineer data
       /*新增变量*/
-      fileArr:[],
       fileList:[],
+      imageArr:[],
       id:null,
       orderId:null,
       locationInfo: null,
@@ -254,11 +272,24 @@ export default {
 
 
   methods: {
-    handleFileChange(event) {
-      const files = event.target.files;
-      for (const file of files) {
-        this.displayImage(file);
-      }
+     /*新增方法*/
+     handleFileChange(file,fileList) {
+      this.fileList=fileList;
+      this.imageArr=[];
+      this.fileList.forEach(f=>{
+        let imgResult = URL.createObjectURL(f.raw);
+        this.imageArr.push(imgResult);
+      })
+    },
+    /*新增方法*/
+    handleFileRemove(file,fileList)
+    {
+      this.fileList=fileList;
+      this.imageArr=[];
+      this.fileList.forEach(f=>{
+        let imgResult = URL.createObjectURL(f.raw);
+        this.imageArr.push(imgResult);
+      })
     },
     displayImage(file) {
       const reader = new FileReader();
@@ -430,10 +461,9 @@ export default {
           console.log("正在创建回收订单",this.id)
           dataToPass.append("Json",JSON.stringify(this.form));
           console.log("FormData 中的 this.form 部分:", this.form);
-          for(var i=0;i<this.form.uploadedImages.length;i++)
-          {
-           dataToPass.append("file",this.form.uploadedImages[i]);
-          }
+          this.fileList.forEach(file=>{
+            dataToPass.append("file",file.raw);
+        })
           const createResponse = await insertNavigationUpload(dataToPass);
           console.log(createResponse.data);
   
@@ -452,10 +482,7 @@ export default {
         console.error('Error creating order:', error);
         } 
       },
-      fileChange(file)
-      {
-        this.form.uploadedImages.push(file.raw);
-      },
+      
     // go_center() {
     //   this.$router.push({ name: 'CenterPage' });
 
