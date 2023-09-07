@@ -11,14 +11,22 @@
       </el-steps>
     </el-header>
 
-    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">      
-      <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />     
+    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
+      <el-table-column type="selection" width="55" />
+      <el-table-column label="图片信息" width="180">
+        <template #default="{ row }">
+          <img :src="row.imageUrl" alt="图片" style="width: 100px; height: 100px;" />
+        </template>
+      </el-table-column>
+      <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
+      
       <el-table-column property="下单时间" label="下单时间" min-width="180"></el-table-column>
       <el-table-column property="设备品牌" label="设备品牌" min-width="120"></el-table-column>
       <el-table-column property="设备型号" label="设备型号" min-width="120"></el-table-column>
       <el-table-column property="回收地点" label="回收地点" min-width="300"></el-table-column>
-      <el-table-column property="回收价格" label="回收价格" width="150"></el-table-column>
-      <el-table-column property="订单状态" label="订单状态" width="100"></el-table-column>
+
+      <!-- <el-table-column property="预期价格" label="预期价格" width="150"></el-table-column> -->
+
      
     </el-table>
 
@@ -85,7 +93,7 @@ export default {
         this.uploadedImages = parsedData.uploadedImages;
         this.productId = parsedData.productId;
         this.orderId = parsedData.orderId;
-this.price = parsedData.form.ExpectedPrice;
+
         // 现在orderId已经被赋值，你可以安全地访问它。
         console.log("order", this.orderId);
         console.log("form", this.form);
@@ -96,12 +104,11 @@ this.price = parsedData.form.ExpectedPrice;
         this.tableData.push({
           form: parsedData.form,
           '服务类型（维修/回收）': '回收',
-          设备品牌: parsedData.Brand,
+          设备品牌: parsedData.form.deviceName,
           设备型号: parsedData.form.Device_Type,
           回收地点: parsedData.form.Recycle_Location,
           下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-          回收价格: parsedData.form.ExpectedPrice,
-          订单状态: '待提交', 
+          预期价格: parsedData.form.ExpectedPrice,
         });
       }
     } catch (error) {

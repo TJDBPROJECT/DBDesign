@@ -12,6 +12,15 @@
     </el-header>
 
     <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
+      <el-table-column type="selection" width="50" />
+      <!-- <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
+      
+      <el-table-column property="下单时间" label="下单时间" width="180"></el-table-column>
+      <el-table-column property="下单用户名" label="下单用户名" width="120"></el-table-column>
+      <el-table-column property="物品名称" label="物品名称" width="120"></el-table-column>
+      <el-table-column property="约定的服务地点" label="约定的服务地点" width="300"></el-table-column>
+      <el-table-column property="订单金额" label="订单金额" width="150"></el-table-column>
+      <el-table-column property="订单状态" label="订单状态" width="100"></el-table-column> -->
       <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" min-width="180" />
 <el-table-column property="下单时间" label="下单时间" min-width="180" />
 <el-table-column property="物品名称" label="物品名称" min-width="120" />

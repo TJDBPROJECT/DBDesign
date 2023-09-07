@@ -10,17 +10,12 @@
         <el-step title="Step 4" description="Some description" />
       </el-steps>
     </el-header>
-
-    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">      
-      <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />     
-      <el-table-column property="下单时间" label="下单时间" min-width="180"></el-table-column>
-      <el-table-column property="设备品牌" label="设备品牌" min-width="120"></el-table-column>
-      <el-table-column property="设备型号" label="设备型号" min-width="120"></el-table-column>
-      <el-table-column property="回收地点" label="回收地点" min-width="300"></el-table-column>
-      <el-table-column property="回收价格" label="回收价格" width="150"></el-table-column>
-      <el-table-column property="订单状态" label="订单状态" width="100"></el-table-column>
-     
-    </el-table>
+    <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" min-width="180" />
+<el-table-column property="下单时间" label="下单时间" min-width="180" />
+<el-table-column property="物品名称" label="物品名称" min-width="120" />
+<el-table-column property="约定的服务地点" label="约定的服务地点" min-width="300" />
+<el-table-column property="订单金额" label="订单金额" min-width="150" />
+<el-table-column property="订单状态" label="订单状态" min-width="100" />
 
     <div class="spacer"></div>
     <div class="spacer"></div>
@@ -45,7 +40,7 @@
 
 <script>
 import { ref } from 'vue';
-import { ElTable, ElSteps, ElCountdown } from 'element-plus';
+import {  ElSteps, ElCountdown } from 'element-plus';
 import { deleteRecycleOrder } from "@/api/recycleprice_info.js";
 import { mapState } from 'vuex';
 import dayjs from 'dayjs';
@@ -54,7 +49,6 @@ import axios from 'axios';
 export default {
   name: 'PricePage',
   components: {
-    ElTable,
     ElSteps,
     ElCountdown,
   },
@@ -84,8 +78,8 @@ export default {
         this.form = parsedData.form;
         this.uploadedImages = parsedData.uploadedImages;
         this.productId = parsedData.productId;
-        this.orderId = parsedData.orderId;
-this.price = parsedData.form.ExpectedPrice;
+        this.orderId = parsedData.orderId;  
+        this.price = parsedData.form.ExpectedPrice
         // 现在orderId已经被赋值，你可以安全地访问它。
         console.log("order", this.orderId);
         console.log("form", this.form);
@@ -96,12 +90,11 @@ this.price = parsedData.form.ExpectedPrice;
         this.tableData.push({
           form: parsedData.form,
           '服务类型（维修/回收）': '回收',
-          设备品牌: parsedData.Brand,
+          设备品牌: parsedData.form.deviceName,
           设备型号: parsedData.form.Device_Type,
           回收地点: parsedData.form.Recycle_Location,
           下单时间: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-          回收价格: parsedData.form.ExpectedPrice,
-          订单状态: '待提交', 
+          预期价格: parsedData.form.ExpectedPrice,
         });
       }
     } catch (error) {
@@ -131,12 +124,13 @@ this.price = parsedData.form.ExpectedPrice;
       try {
         const uid = this.id; 
         const num = this.price; 
+        console.log('收入',num);
         const response = await axios.post(`http://110.42.220.245:8081/Balance/Income/${uid}?num=${num}`);
         
         if (response.data.success) {
-          console.log('Recharge successful');
+          console.log('收入successful');
         } else {
-          console.error('Recharge failed');
+          console.error('收入failed');
         }
       } catch (error) {
         console.error('Error during recharge:', error);
@@ -233,14 +227,4 @@ this.price = parsedData.form.ExpectedPrice;
   .countdown-footer {
     margin-top: 8px;
   }
-
-
-  .el-table__header-wrapper {
-  margin-bottom: 0px; /* 调整表头底部的边距 */
-}
-
-/* 表格内容底部样式 */
-.el-table__footer-wrapper {
-  margin-top: 0px; /* 调整表格内容底部的边距 */
-}
 </style>
