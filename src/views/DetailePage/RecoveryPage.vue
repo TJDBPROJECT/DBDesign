@@ -56,12 +56,25 @@
         </div>
         
         <el-form ref="productForm" :model="form" label-width="120px">
-          <el-form-item label="存储容量">
-            <DropdownList :options="['64G', '128G', '256G','无']" v-model="form.storage_capacity"></DropdownList>
-          </el-form-item>
+          
+          <el-form ref="productForm" :model="form" label-width="120px">
+            <el-form-item label="存储容量">
+              <el-select v-model="form.StorageCapacity" placeholder="请选择存储容量">
+                <el-option label="64G" value="64G"></el-option>
+                <el-option label="128G" value="128G"></el-option>
+                <el-option label="256G" value="256G"></el-option>
+                <el-option label="无" value="无"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+
 
           <el-form-item label="购买渠道">
-            <DropdownList :options="['自营门店', '官方门店', '网络门店']" v-model="form.purchase_channel"></DropdownList>
+            <el-select v-model="form.PurchaseChannel" placeholder="请选择购买渠道">
+              <el-option label="自营门店" value="自营门店"></el-option>
+              <el-option label="官方门店" value="官方门店"></el-option>
+              <el-option label="网络门店" value="网络门店"></el-option>
+            </el-select>
           </el-form-item>
 
           <el-form-item label="回收时间" label-align="center" align="center">
@@ -69,15 +82,15 @@
           </el-form-item>
 
           <el-form-item label="回收地点" label-align="center" align="center">
-  <el-select v-model="form.Recycle_Location">
-    <el-option
-      v-for="location in locationInfo"
-      :key="location.ID"
-      :label="location.Location_Name"
-      :value="`${location.Location_Name} ${location.Loc_Detail}`"
-    />
-  </el-select>
-</el-form-item>
+            <el-select v-model="form.Recycle_Location">
+              <el-option
+                v-for="location in locationInfo"
+                :key="location.ID"
+                :label="location.Location_Name"
+                :value="`${location.Location_Name} ${location.Loc_Detail}`"
+              />
+            </el-select>
+          </el-form-item>
 
         </el-form>
         <!-- 修改部分 -->
@@ -105,7 +118,7 @@
   
   <script>
   // import RepairHistory from '@/components/RepairHistory.vue'
-  import DropdownList from '@/components/DropdownList.vue';
+  // import DropdownList from '@/components/DropdownList.vue';
   import header from '/src/components/header.vue'
   import axios from 'axios';
   import {insertNavigationUpload,getLocationInfo} from "@/api/recycle_info.js";
@@ -135,13 +148,12 @@
         form: {
           Device_Cate: 'phone',
           Device_Type: '',
-          // deviceName: '',
           ExpectedPrice: 0,
           CustomerLocation:'shanghai',
           Recycle_Location: '',
           Recycle_Time: '',
-          storage_capacity:'',
-          purchase_channel:'',          
+          StorageCapacity:'',
+          PurchaseChannel:'',          
         },
         uploadedImages: ['http://110.42.220.245:8081/Image/iPhone6.jpg',],
         deviceInfo: null,
@@ -157,7 +169,7 @@
     components: {
       "seach": header,
       // RepairHistory,
-      DropdownList,
+      // DropdownList,
     },
     mounted() {
     // 接收上一个组件的值，并将其赋给data.product.productId
@@ -180,47 +192,39 @@
     },
     methods: {
       calculatePrice() {
-        let basePrice = 100; // 设置基础价格
-        // 根据手机型号信息调整价格
-        if (this.form.deviceName === 'iphone') {
-          basePrice += 80;
-        } else if (this.form.deviceName === '华为') {
-          basePrice += 80;
-        } else if (this.form.deviceName === '小米') {
-          basePrice += 50;
-        } else if (this.form.deviceName === '三星') {
-          basePrice += 50;
-        } else if (this.form.deviceName === 'oppo') {
-          basePrice += 50;
-        } else if (this.form.deviceName === 'vivo') {
-          basePrice += 50;
-        } else if (this.form.deviceName === '联想') {
-          basePrice += 100;
-        } else if (this.form.deviceName === '索尼') {
-          basePrice += 100;
-        } else if (this.form.deviceName === '戴尔') {
-          basePrice += 100;
-        } else if (this.form.deviceName === '任天堂') {
-          basePrice += 150;
-        } 
-        if (this.form.problem === '设备磨损') {
-          basePrice += 100;
-        } else if (this.form.problem === '设备屏幕损毁（出现裂缝，黑屏等）') {
-          basePrice += 500;
-        } else if (this.form.problem === '设备系统出现损坏') {
-          basePrice += 200;
-        } else if (this.form.problem === '设备镜头损坏') {
-          basePrice += 300;
-        } else if (this.form.problem === '设备音响出现问题（没有声音，声音刺耳等问题）') {
-          basePrice += 200;
-        } else if (this.form.problem === '设备无法开机问题') {
-          basePrice += 50;
-        } else if (this.form.problem === '设备出现卡顿，死机问题') {
-          basePrice += 60;
-        } 
+  let basePrice = 100; // 设置基础价格
 
-        return basePrice;
-      },
+  // 根据存储容量调整价格
+  if (this.form.StorageCapacity === '64G') {
+    basePrice += 50; // 假设增加50元
+  } else if (this.form.StorageCapacity === '128G') {
+    basePrice += 100; // 假设增加100元
+  } else if (this.form.StorageCapacity === '256G') {
+    basePrice += 150; // 假设增加150元
+  }
+
+  // 根据时间长短调整价格
+  if (this.form.Recycle_Time instanceof Date) {
+    const currentTime = new Date();
+    const timeDifference = this.form.Recycle_Time.getTime() - currentTime.getTime();
+    
+    // 假设每小时加价10元
+    const hoursDifference = Math.ceil(timeDifference / (60 * 60 * 1000));
+    const timePrice = hoursDifference * 10;
+    basePrice += timePrice;
+  }
+
+  // 根据设备类型调整价格
+  if (this.form.Device_Type === 'phone') {
+    basePrice += 50; // 假设手机类设备加价50元
+  } else if (this.form.Device_Type === 'tablet') {
+    basePrice += 80; // 假设平板类设备加价80元
+  } // 根据您的需求添加更多设备类型
+
+  // 还可以根据其他选项继续调整价格
+
+  return basePrice;
+},
       selectOption(option) {
         this.selectedOption = option;
         this.$emit('option-selected', option);
@@ -295,8 +299,13 @@
           this.form.ExpectedPrice = this.calculatePrice();
           const dataToPass = new FormData();
           this.id =this.userid
+          if (this.form.Recycle_Time instanceof Date) {
+        // 将日期转换为所需格式
+            this.form.Recycle_Time = this.form.Recycle_Time.toISOString();
+          }
+          console.log("正在创建回收订单", this.form.Recycle_Time)
           dataToPass.append('id', this.id);
-          console.log("正在创建回收订单",this.id)
+          
           dataToPass.append("Json",JSON.stringify(this.form));
           console.log("FormData 中的 this.form 部分:", this.form);
           for(var i=0;i<this.fileArr.length;i++)

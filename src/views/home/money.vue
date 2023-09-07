@@ -10,9 +10,6 @@
           <el-form-item label="银行名称">
             <el-input v-model="form.bank"></el-input>
           </el-form-item>
-          <el-form-item label="密码">
-            <el-input v-model="form.password" type="password"></el-input>
-          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addBankCard">添加银行卡</el-button>
           </el-form-item>

@@ -11,24 +11,6 @@
       </el-steps>
     </el-header>
 
-    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
-      <el-table-column type="selection" width="55" />
-      <el-table-column label="图片信息" width="180">
-        <template #default="{ row }">
-          <img :src="row.imageUrl" alt="图片" style="width: 100px; height: 100px;" />
-        </template>
-      </el-table-column>
-      <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
-      
-      <el-table-column property="下单时间" label="下单时间" width="180"></el-table-column>
-      <el-table-column property="设备品牌" label="设备品牌" width="120"></el-table-column>
-      <el-table-column property="设备型号" label="设备型号" width="120"></el-table-column>
-      <el-table-column property="回收地点" label="回收地点" width="300"></el-table-column>
-
-      <!-- <el-table-column property="预期价格" label="预期价格" width="150"></el-table-column> -->
-
-     
-    </el-table>
 
     <div class="spacer"></div>
     <div class="spacer"></div>
@@ -53,7 +35,7 @@
 
 <script>
 import { ref } from 'vue';
-import { ElTable, ElSteps, ElCountdown } from 'element-plus';
+import {  ElSteps, ElCountdown } from 'element-plus';
 import { deleteRecycleOrder } from "@/api/recycleprice_info.js";
 import { mapState } from 'vuex';
 import dayjs from 'dayjs';
@@ -62,7 +44,6 @@ import axios from 'axios';
 export default {
   name: 'PricePage',
   components: {
-    ElTable,
     ElSteps,
     ElCountdown,
   },
@@ -92,8 +73,8 @@ export default {
         this.form = parsedData.form;
         this.uploadedImages = parsedData.uploadedImages;
         this.productId = parsedData.productId;
-        this.orderId = parsedData.orderId;
-
+        this.orderId = parsedData.orderId;  
+        this.price = parsedData.form.ExpectedPrice
         // 现在orderId已经被赋值，你可以安全地访问它。
         console.log("order", this.orderId);
         console.log("form", this.form);
@@ -138,12 +119,13 @@ export default {
       try {
         const uid = this.id; 
         const num = this.price; 
+        console.log('收入',num);
         const response = await axios.post(`http://110.42.220.245:8081/Balance/Income/${uid}?num=${num}`);
         
         if (response.data.success) {
-          console.log('Recharge successful');
+          console.log('收入successful');
         } else {
-          console.error('Recharge failed');
+          console.error('收入failed');
         }
       } catch (error) {
         console.error('Error during recharge:', error);

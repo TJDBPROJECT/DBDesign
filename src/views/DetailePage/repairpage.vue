@@ -57,11 +57,12 @@
           <div class="descriptions-container">
             <h2 class="descriptions-title">在下面表格中请填写你的用户信息</h2>
             <el-descriptions class="custom-descriptions" :column="1" border>
+              <!-- 直接显示获取的姓名和电话号码 -->
               <el-descriptions-item label="姓名" label-align="center" align="center">
-                <el-input v-model="this.name"></el-input>
+                {{ this.name }}
               </el-descriptions-item>
-              <el-descriptions-item label="联系电话" label-align="center" align="center" background-color=" blue">
-                <el-input v-model="this.phone"></el-input>
+              <el-descriptions-item label="联系电话" label-align="center" align="center" background-color="blue">
+                {{ this.phone }}
               </el-descriptions-item>
               <el-descriptions-item label="居住地址" label-align="center" align="center" background-color=" blue">
                 <el-select v-model="form.CustomerLocation">
@@ -158,7 +159,7 @@
                     </div>
                   <!-- </el-popover>                       -->
                 </el-popover>
-                <el-select v-else v-model="form.EngineerID" placeholder="请选择工程师">
+                <el-select v-else v-model="form.engineer" placeholder="请选择工程师">
                   <el-option v-for="engineer in engineersData" :key="engineer.ID" :label="engineer.Name" :value="engineer.ID"></el-option>
                 </el-select>
               </el-descriptions-item>
@@ -192,6 +193,7 @@ import axios from 'axios';
 import { mapState} from 'vuex';
 import {insertNavigationUpload} from "@/api/repairprice_info.js";
 import {getLocationInfo} from "@/api/repair_info.js";
+import { ElMessage} from 'element-plus'
 export default {
   name: 'RepairPage',
   computed: {
@@ -213,6 +215,7 @@ export default {
         isWarranty:'',
         uploadedImages: [], // Store uploaded image URLs
         CustomerLocation:'',
+        Password:'',
       },
       productId:null,
       name:'',
@@ -224,6 +227,7 @@ export default {
       fileList:[],
       imageArr:[],
       id:null,
+      userInfo:'',
       orderId:null,
       locationInfo: null,
       // engineersData: [
@@ -239,6 +243,7 @@ export default {
       this.productId = this.$route.params.productId;
       console.log("接收的 productId:", this.$route.params.productId);
       this.fetchEngineersData(); // 在组件挂载时获取工程师数据
+      this.fetchUserInfo();
     },
     created() {
       this.getLocationData()
@@ -249,6 +254,7 @@ export default {
         console.log("获取地址信息失败");
         console.error('Error:', error);
       });
+      
     },
 
   /*created() {
@@ -378,6 +384,26 @@ export default {
       console.error('获取工程师数据失败:', error);
     }
   },
+  async fetchUserInfo() {
+  try {
+    const response = await axios.get(`http://110.42.220.245:8081/UserInfo/${this.userid}`);
+    const userInfoArray = response.data;
+    
+    // 假设只有一个用户信息对象
+    const userInfo = userInfoArray[0];
+    
+    // 从用户信息对象中获取所需的信息
+    this.name = userInfo.name; // 注意属性名的大小写
+    this.phone = userInfo.telephone; // 注意属性名的大小写
+    this.form.Password= userInfo.password;
+    console.log('成功获取个人信息:', userInfo);
+    console.log('成功获取个人信息:', this.name);
+    console.log('成功获取个人信息:', this.phone);
+    console.log('成功获取个人信息:', this.form.Password);
+  } catch (error) {
+    console.error('获取个人信息失败:', error);
+  }
+},
   // 获取地址信息
   getLocationData() {
       return getLocationInfo(this.userid)
@@ -394,6 +420,7 @@ export default {
           console.error('获取地址信息失败:', error);
         });
     },
+  
     showSiteDetails() {
       // Implement the functionality for the "维修站点详情" button
       // For example, you can redirect to a new page or show a modal with site details
@@ -419,69 +446,73 @@ export default {
     },
    
     async goToPricePage() {
-      try {
-         // 构造要传递给PricePage的数据
-         const price = this.calculatePrice();
-         console.log('计算得到的价格:', price);
-         this.form.OrderPrice=price;
-         const currentTime = new Date();
-         const eightHoursLater = new Date(currentTime.getTime() + 8 * 60 * 60 * 1000); // 8小时的毫秒数
-         const formattedTime = eightHoursLater.toISOString().slice(0, 19);// 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
-         console.log('下单时间:', formattedTime);
-         await this.submitForm();
-         const dataToPass = {
-          form: this.form,
-          uploadedImages: this.uploadedImages,
-          price: price, // 将计算得到的价格传递给PricePage
-          currentTime: formattedTime, // 下单的本地时间
-          productId:this.productId,
-          orderId:this.orderId,
-        };
-        console.log("传递的数据", dataToPass);
-         // 使用query参数传递数据，而不是params
-         this.$router.push({
-          name: 'pricepage',
-          query: {
-            data: JSON.stringify(dataToPass),
-          },
-         
-        });
-        
-      } catch (error) {
-        console.error('Error navigating to PricePage:', error);
-      }
-    },
-    async submitForm()
-      {
-        try{
-          this.form.ExpectedPrice = this.calculatePrice();
-          const dataToPass = new FormData();
-          this.id =this.userid
-          dataToPass.append('id', this.id);
-          console.log("正在创建回收订单",this.id)
-          dataToPass.append("Json",JSON.stringify(this.form));
-          console.log("FormData 中的 this.form 部分:", this.form);
-          this.fileList.forEach(file=>{
-            dataToPass.append("file",file.raw);
-        })
-          const createResponse = await insertNavigationUpload(dataToPass);
-          console.log(createResponse.data);
-  
-          if (createResponse.data.success) {
-            console.log('维修订单创建成功:', createResponse.data);
-             // 获取返回的orderid并存储在页面数据中
-              const orderId = createResponse.data.orderid; // 假设返回的字段名是orderid
-              this.orderId = orderId;
-              console.log("获取订单id",this.orderId)
-          } 
-          else {
-            console.error('维修订单创建失败:', createResponse.data);
-          }
-        }
-        catch (error) {
-        console.error('Error creating order:', error);
-        } 
-      },
+  try {
+    // 构造要传递给PricePage的数据
+    const price = this.calculatePrice();
+    console.log('计算得到的价格:', price);
+    this.form.OrderPrice = price;
+    const currentTime = new Date();
+    const eightHoursLater = new Date(currentTime.getTime() + 8 * 60 * 60 * 1000); // 8小时的毫秒数
+    const formattedTime = eightHoursLater.toISOString().slice(0, 19); // 保留 "YYYY-MM-DDTHH:MM:SS" 部分; // 保持 ISO 格式
+    console.log('下单时间:', formattedTime);
+    const createResponse = await this.submitForm();
+    const dataToPass = {
+      form: this.form,
+      uploadedImages: this.uploadedImages,
+      price: price, // 将计算得到的价格传递给PricePage
+      currentTime: formattedTime, // 下单的本地时间
+      productId: this.productId,
+      orderId: this.orderId,
+    };
+    console.log("传递的数据", dataToPass);
+
+    if (createResponse.data.success) {
+      console.log('维修订单创建成功:', createResponse.data);
+      // 获取返回的orderid并存储在页面数据中
+      const orderId = createResponse.data.orderid; // 假设返回的字段名是orderid
+      this.orderId = orderId;
+      console.log("获取订单id", this.orderId);
+
+      // 在订单创建成功时进行页面跳转
+      this.$router.push({
+        name: 'pricepage',
+        query: {
+          data: JSON.stringify(dataToPass),
+        },
+      });
+    } else {
+      console.error('维修订单创建失败:', createResponse.data);
+      ElMessage.error(createResponse.data.message || '订单创建失败，请稍后重试或联系客服支持！');
+    }
+  } catch (error) {
+    console.error('Error navigating to PricePage:', error);
+    ElMessage.error('订单创建失败，请稍后重试或联系客服支持！');
+  }
+},
+
+async submitForm() {
+  try {
+    this.form.ExpectedPrice = this.calculatePrice();
+    const dataToPass = new FormData();
+    this.id = this.userid
+    dataToPass.append('id', this.id);
+    console.log("正在创建回收订单", this.id)
+    dataToPass.append("Json", JSON.stringify(this.form));
+    console.log("FormData 中的 this.form 部分:", this.form);
+    this.fileList.forEach(file => {
+      dataToPass.append("file", file.raw);
+    })
+    const createResponse = await insertNavigationUpload(dataToPass);
+    console.log(createResponse.data);
+
+    return createResponse; // 返回响应以供调用者处理
+
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error; // 抛出错误以便在调用处处理
+  }
+},
+
       
     // go_center() {
     //   this.$router.push({ name: 'CenterPage' });

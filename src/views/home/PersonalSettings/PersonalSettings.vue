@@ -80,26 +80,7 @@
         </el-collapse-item>
         <!--/账户信息修改 -->
         <!--外观显示设置-->
-        <el-collapse-item name="2">
-          <template #title>
-            <span style="font-size: 18px;">显示&外观</span>
-          </template>
-          <br>
-          <div style="margin-left: 3%;">
-            <el-form :model="fontSize" label-width=auto>
 
-              <el-form-item label="字体大小">
-                <el-select v-model="fontSize" placeholder="请选择字体大小">
-                  <el-option v-for="item in fontSizeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-              </el-form-item>
-
-              <el-form-item label="深色模式">
-                <el-switch v-model="isDark" />
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-collapse-item>
         
       </el-collapse>
       <br><br><br><br><br><br><br><br><br><br>
@@ -134,7 +115,7 @@ export default {
         identify: '4305*************7'
       },
       formPassword: {
-        nowPassword: '123456',
+        nowPassword: '12356',
         oldPassword: '',
         newPassword: ''
       },
@@ -220,9 +201,10 @@ export default {
       // 执行密码修改的操作，比如向后端发送请求
       // 在示例中，我们只是简单地打印新密码
       console.log('新密码:', this.formPassword.newPassword);
+      this.formPassword.nowPassword = this.formPassword.newPassword;
       this.save();
       this.$message.success('密码修改成功');
-      this.formPassword.nowPassword = this.formPassword.newPassword;
+     
       this.handleReset();
     },
     signOut()
@@ -233,6 +215,7 @@ export default {
   },
   created(){
     console.log("尝试获取个人信息")
+      console.log(this.userid)
       //请求地址,this和vm指的是全局
       getInfo(this.userid).then((res) => {
         console.log(res.data)
@@ -241,7 +224,7 @@ export default {
         }
         else {
           console.log("拿数据成功")
-          console.log(res.data[0].email)
+         
           this.formData.name = res.data[0].name
           this.formData.username= res.data[0].userName
           this.formData.phone= res.data[0].telephone

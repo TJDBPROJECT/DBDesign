@@ -11,19 +11,7 @@
       </el-steps>
     </el-header>
 
-    <el-table :ref="multipleTableRef" :data="tableData" style="width: 100%">
-      <el-table-column type="selection" width="55" />
-      <el-table-column property="服务类型（维修/回收）" label="服务类型（维修/回收）" width="180" />
-      
-      <el-table-column property="下单时间" label="下单时间" width="180"></el-table-column>
-      <el-table-column property="下单用户名" label="下单用户名" width="120"></el-table-column>
-      <el-table-column property="物品名称" label="物品名称" width="120"></el-table-column>
-      <el-table-column property="约定的服务地点" label="约定的服务地点" width="300"></el-table-column>
-      <el-table-column property="订单金额" label="订单金额" width="150"></el-table-column>
-      <el-table-column property="订单状态" label="订单状态" width="100"></el-table-column>
 
-     
-    </el-table>
 
     <div class="spacer"></div>
 
@@ -48,14 +36,13 @@
 
 <script>
 import { ref} from 'vue';
-import { ElTable, ElSteps, ElCountdown } from 'element-plus';
+import {  ElSteps, ElCountdown } from 'element-plus';
 import { deleteRepairOrder } from "@/api/repairprice_info.js";
 import { mapState} from 'vuex'
 
 export default {
   name: 'PricePage',
   components: {
-    ElTable,
     ElSteps,
     ElCountdown,
   },
@@ -64,6 +51,8 @@ export default {
   },
   data() {
     return {
+      value: Date.now() + 1000 * 60 * 60 * 7,
+      value1: Date.now() + 1000 * 60 * 60 * 24 * 2,
       multipleTableRef: ref(null),
       tableData: ref([]),
       currentTime: null,
