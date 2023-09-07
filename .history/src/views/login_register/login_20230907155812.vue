@@ -78,8 +78,9 @@ export default {
         // 验证码数据
         this.loginForm.code = "",
         // 记住密码
-        this.loginForm.remember = false
-        
+        this.loginForm.remember = false,
+        // 验证码的key，因为前后端分离，这里验证码不能由后台存入session，所以交给vue状态管理
+        this.loginForm.codeToken = ""
     },
     signUp() {
       this.$router.push('/mainpage')

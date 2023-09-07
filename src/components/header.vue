@@ -2,30 +2,34 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false" @select="handleSelect">
-        <!--logo部分-->
-        <el-menu-item index="0" @click="tomain"> <img :src="logo" style="width: 120px; height: 92px" /></el-menu-item>
-        <el-col :span="16">
-            <!--搜索栏部分-->
-            <div class="search">
-                <el-row>
-                    <el-col :span="16" :offset="4">
-                        <el-input v-model="input" @keydown="handleKeypress" placeholder="请输入" />
-                    </el-col>
-                    <el-col :span="4" :offset="0">
-                        <el-button type="primary" class="search-btn" @click="search">搜索</el-button>
-                    </el-col>
-                </el-row>
-            </div>
-        </el-col>
-        <!--右部菜单部分-->
-        <div class="flex-grow" />
-        <el-menu-item index="1" @click="tomail">邮箱</el-menu-item>
-        <el-menu-item index="2" @click="toevaluatepage">维修与回收</el-menu-item>
-        <el-menu-item index="3" @click="tomainhome">
-            <template #title>个人主页</template>
-        </el-menu-item>
+      <!--logo部分-->
+      <el-menu-item index="0" @click="tomain">
+        <img :src="logo" style="width: 120px; height: 92px" />
+      </el-menu-item>
+      <el-col :span="16">
+        <!--搜索栏部分-->
+        <div class="search">
+          <el-row>
+            <el-col :span="16" :offset="4">
+              <el-input v-model="input" @keydown="handleKeypress" placeholder="请输入" />
+            </el-col>
+            <el-col :span="4" :offset="0">
+              <el-button type="primary" class="search-btn" @click="search">搜索</el-button>
+            </el-col>
+          </el-row>
+        </div>
+      </el-col>
+      <!--右部菜单部分-->
+      <div class="flex-grow" />
+      <el-menu-item index="1" @click="tomail">邮箱</el-menu-item>
+      <el-menu-item index="2" @click="toevaluatepage">维修与回收</el-menu-item>
+      <el-menu-item index="3" @click="tomainhome">
+        <template #title>个人主页</template>
+      </el-menu-item>
     </el-menu>
-</template>
+  </template>
+  
+
 
 <script >
 import { ref } from 'vue'
@@ -84,6 +88,10 @@ export default {
 </script>
 
 <style scoped>
+
+.el-menu-demo {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 .search {
     margin-top: 20px;
 }

@@ -2,7 +2,7 @@
   <ElForm class="register-form" ref="registerRef" :model="registerForm" :rules="rules">
     <h1 class="register-title">注册</h1>
     <ElFormItem prop="username">
-      <ElInput placeholder="请输入账号" :prefix-icon="icons.UserFilled" v-model="registerForm.username" size="large"></ElInput>
+      <ElInput placeholder="请输入昵称" :prefix-icon="icons.UserFilled" v-model="registerForm.username" size="large"></ElInput>
     </ElFormItem>
     <ElFormItem prop="password">
       <ElInput placeholder="请输入密码" :prefix-icon="icons.Lock" v-model="registerForm.password" size="large"></ElInput>
@@ -72,8 +72,8 @@ export default {
       rules: {
         // 设置用户名效验规则
         username: [
-          { required: true, message: "请输入账户", trigger: "blur" },
-          { min: 3, max: 10, message: "长度在 3 到 10 个字符的账户", trigger: "blur" },
+          { required: true, message: "请输入昵称", trigger: "blur" },
+          { min: 3, max: 10, message: "长度在 3 到 10 个字符的昵称", trigger: "blur" },
         ],
         // 设置密码效验规则
         password: [
@@ -111,6 +111,15 @@ export default {
     };
   },
   methods: {
+    resetForm()
+    {
+      this.registerForm.email=""
+      this.registerForm.identity=""
+      this.registerForm.name=""
+      this.registerForm.password=""
+      this.registerForm.telephone=""
+      this.registerForm.username=""
+    },
     // 提交表单
     zhuce() {
       console.log("点击了注册键")
@@ -125,12 +134,16 @@ export default {
         name:this.registerForm.name,
       }
       console.log(params)
-    
+      let success=true
+      if(params.email==""||params.identity==""||params.name==""||params.password==""||params.telephone==""||params.user_name=="")
+      {
+        success=false;
+      }
       register(params).then((res) => {
         console.log(res.data)
-        if (res.data === false) {
-          vm.$message.error("注册失败");
-          vm.resetForm();
+        if (res.data === false||success==false) {
+          this.$message.error("注册失败");
+          this.resetForm();
         }
         else {
           vm.$message.success("注册成功");

@@ -61,7 +61,7 @@ export default {
         // 设置验证码效验规则
         code: [
           { required: true, message: "请输入验证码", trigger: "blur" },
-          { min: 4, max: 5, message: "验证码错误", trigger: "blur" },
+          { min: 4, max: 5, message: "长度为4 到 5 个字符", trigger: "blur" },
         ],
       },
       // 绑定验证码图片
@@ -78,8 +78,9 @@ export default {
         // 验证码数据
         this.loginForm.code = "",
         // 记住密码
-        this.loginForm.remember = false
-        
+        this.loginForm.remember = false,
+        // 验证码的key，因为前后端分离，这里验证码不能由后台存入session，所以交给vue状态管理
+        this.loginForm.codeToken = ""
     },
     signUp() {
       this.$router.push('/mainpage')
@@ -103,7 +104,7 @@ export default {
           this.resetForm();
         }
         else {
-          this.$message.success("登录成功")
+          this.$message("登录成功")
           this.$router.push('/mainpage')
         }
       })
